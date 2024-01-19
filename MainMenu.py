@@ -11,7 +11,12 @@ class MainMenu(QMenuBar):
 
         self.__about = help_menu.addAction('О программе...')
         self.about_qt = help_menu.addAction('О библиотеке Qt...')
-    
+
+        help_menu = self.addMenu('Учитель')
+        self.teacher_add = help_menu.addAction('Добавить')
+        self.teacher_edit = help_menu.addAction('Редактировать')
+        self.teacher_delete = help_menu.addAction('Удалить')
+
     @property
     def about(self):
         return self.__about
