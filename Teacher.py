@@ -40,6 +40,7 @@ class Model(QSqlQueryModel):
         cursor.execute(INSERT, data)
         # чтобы сохранить данные в БД вызываем коммит
         conn.commit()
+        self.obnovit()
 
 
 class View(QTableView):
