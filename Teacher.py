@@ -11,6 +11,19 @@ INSERT = """insert into teacher ( f_fio, f_phone, f_email, f_comment )
          values ( %s, %s, %s, %s ) ;         
 """
 
+SELECT_ONE = """select f_fio, f_phone, f_email, f_comment
+                from teacher
+                where id = %s ;
+            """
+
+UPDATE = """
+            update teacher set
+            f_fio = %s,
+            f_phone = %s,
+            f_email = %s,
+            f_comment = %s
+            where id = %s ;
+"""
 
 class Model(QSqlQueryModel):
 
@@ -40,6 +53,19 @@ class Model(QSqlQueryModel):
         cursor.execute(INSERT, data)
         # чтобы сохранить данные в БД вызываем коммит
         conn.commit()
+        conn.close()
+        self.obnovit()
+
+    def update(self, id_teacher, fio, phone, email, comment):
+        conn = psycopg2.connect(**st.db_params)
+        # вспомогательный обект курсор которй непосредственно отправляет
+        # команду в базу данных  и получает оттуда ответ
+        cursor = conn.cursor()
+        data = (fio, phone, email, comment, id_teacher)
+        cursor.execute(UPDATE, data)
+        # чтобы сохранить данные в БД вызываем коммит
+        conn.commit()
+        conn.close()
         self.obnovit()
 
 
@@ -60,7 +86,24 @@ class View(QTableView):
 
     @pyqtSlot()
     def update(self):
-        QMessageBox.information(self, 'Учитель', 'Редактирование')
+        dia = Dialog(parent=self)
+        row = self.currentIndex().row()
+        id_teacher = self.model().record(row).value(0)
+        # подключаемся к базе данных
+        conn = psycopg2.connect(**st.db_params)
+        # создаем курсор
+        cursor = conn.cursor()
+        data = (id_teacher,)
+        cursor.execute(SELECT_ONE, data)
+        # считываем строку из базы даных и записываем в строки диалогового окна
+        dia.fio, dia.phone, dia.email, dia.comment = cursor.fetchone()
+        # после счиьываения обязательно закываем подключение к базе
+        conn.close()
+        if dia.exec():
+            self.model().update(id_teacher, dia.fio,
+                                dia.phone, dia.email,
+                                dia.comment
+                                )
 
     @pyqtSlot()
     def delete(self):
@@ -125,6 +168,10 @@ class Dialog(QDialog):
         if result:
             return result
     
+    @fio.setter
+    def fio(self, value):
+        self.__fio_edt.setText(value)
+    
     @property
     def phone(self):
         result = self.__phone_edt.text().strip()
@@ -133,6 +180,10 @@ class Dialog(QDialog):
         # return result
         if result:
             return result
+        
+    @phone.setter
+    def phone(self, value):
+        self.__phone_edt.setText(value)
     
     @property
     def comment(self):
@@ -144,11 +195,19 @@ class Dialog(QDialog):
         if result:
             return result
     
+    @comment.setter
+    def comment(self, value):
+        self.__comment_edt.setPlainText(value)
+
     @property
     def email(self):
         result = self.__email_edt.text().strip()
         if result:
             return result
+        
+    @email.setter
+    def email(self, value):
+        self.__email_edt.setText(value)
 
 
 
