@@ -25,6 +25,10 @@ UPDATE = """
             where id = %s ;
 """
 
+DELETE = """
+            delete from teacher where id = %s ;
+"""
+
 class Model(QSqlQueryModel):
 
     def __init__(self, parent=None):
@@ -68,6 +72,16 @@ class Model(QSqlQueryModel):
         conn.close()
         self.obnovit()
 
+    def delete(self, id_teacher):
+        conn = psycopg2.connect(**st.db_params)
+        cursor = conn.cursor()
+        data = (id_teacher,)
+        cursor.execute(DELETE, data)
+        conn.commit()
+        conn.close()
+        self.obnovit()
+
+
 
 class View(QTableView):
 
@@ -107,13 +121,20 @@ class View(QTableView):
 
     @pyqtSlot()
     def delete(self):
-        QMessageBox.information(self, 'Учитель', 'Удаление')
+        row = self.currentIndex().row()
+        id_teacher = self.model().record(row).value(0)
+        # при удалении выходит окно для подтверждения
+        ans = QMessageBox.question(self, 'Учитель', 'ВЫ уверены?')
+        if ans == QMessageBox.StandardButton.Yes:
+            self.model().delete(id_teacher)
 
 
 class Dialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        self.setWindowTitle('Учитель')
 
         fio_lbl = QLabel('Фамилия И. О.', parent=self)
         self.__fio_edt = QLineEdit(parent=self)
@@ -131,17 +152,41 @@ class Dialog(QDialog):
         cancel_btn = QPushButton('Отмена', parent=self)
 
         lay = QVBoxLayout(self)
-        lay.addWidget(fio_lbl)
-        lay.addWidget(self.__fio_edt)
-        lay.addWidget(phone_lbl)
-        lay.addWidget(self.__phone_edt)
-        lay.addWidget(email_lbl)
-        lay.addWidget(self.__email_edt)
-        lay.addWidget(comment_lbl)
-        lay.addWidget(self.__comment_edt)
+        lay.setSpacing(15)
+
+        lay_fam = QVBoxLayout()
+        # наводим красоту. устанавливаем расстояние м\у элементами
+        lay_fam.setSpacing(0)
+        lay_fam.addWidget(fio_lbl)
+        lay_fam.addWidget(self.__fio_edt)
+        lay.addLayout(lay_fam)
+
+        lay3 = QHBoxLayout()
+        
+        lay_phn = QVBoxLayout()
+        lay_phn.setSpacing(0)
+        lay_phn.addWidget(phone_lbl)
+        lay_phn.addWidget(self.__phone_edt)
+        lay3.addLayout(lay_phn)
+        
+        lay_em = QVBoxLayout()
+        lay_em.setSpacing(0)
+        lay_em.addWidget(email_lbl)
+        lay_em.addWidget(self.__email_edt)
+        lay3.addLayout(lay_em)
+        
+        lay.addLayout(lay3)
+
+        lay_com = QVBoxLayout()
+        lay_com.setSpacing(0)
+        lay_com.addWidget(comment_lbl)
+        lay_com.addWidget(self.__comment_edt)
+        lay.addLayout(lay_com)
         
         # горизонтальный слой для кнопок "ОК" и "Отмена"
         lay2 = QHBoxLayout()
+        # доавляем пустое пространство чтобы кнопки ок и Отмена были в правом углу
+        lay2.addStretch()
         lay2.addWidget(ok_btn)
         lay2.addWidget(cancel_btn)
         # добавляем горизонтальный слой кнопок(ОК и Отмена) в общий вертикальный слой
