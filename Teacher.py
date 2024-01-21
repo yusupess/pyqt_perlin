@@ -3,16 +3,43 @@ from PyQt6.QtWidgets import QLabel, QLineEdit, QTextEdit, QPushButton
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt6.QtSql import QSqlQueryModel
 from PyQt6.QtCore import pyqtSlot
+import settings as st
+import psycopg2
+
+# команда для вставки новой строчки в базу данных
+INSERT = """insert into teacher ( f_fio, f_phone, f_email, f_comment )
+         values ( %s, %s, %s, %s ) ;         
+"""
 
 
 class Model(QSqlQueryModel):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.obnovit()
 
+    def obnovit(self):
         sql = """select id, f_fio, f_phone, f_email,
                  f_comment from teacher;"""
         self.setQuery(sql)
+
+    def add(self, fio, phone, email, comment):
+        conn = psycopg2.connect(host=st.db_params['host'],
+                                port=st.db_params['port'],
+                                dbname=st.db_params['dbname'],
+                                user=st.db_params['user'],
+                                password=st.db_params['password'],
+                                )
+        # строчку выше можно записать следующим образом
+        # так как поля в сеттингс и ключи совпадают по написанию
+        # conn = psycopg2.connect(**st.db_params)
+        # вспомогательный обект курсор которй непосредственно отправляет
+        # команду в базу данных  и получает оттуда ответ
+        cursor = conn.cursor()
+        data = (fio, phone, email, comment)
+        cursor.execute(INSERT, data)
+        # чтобы сохранить данные в БД вызываем коммит
+        conn.commit()
 
 
 class View(QTableView):
@@ -27,7 +54,8 @@ class View(QTableView):
     def add(self):
         # QMessageBox.information(self, 'Учитель', 'Добавление')
         dia = Dialog(parent=self)
-        dia.exec()
+        if dia.exec():
+            self.model().add(dia.fio, dia.phone, dia.email, dia.comment)
 
     @pyqtSlot()
     def update(self):
@@ -76,8 +104,50 @@ class Dialog(QDialog):
         lay.addLayout(lay2)
         #  подключаем кнопку "Отмена"
         cancel_btn.clicked.connect(self.reject)
+        #  подключаем кнопку "Ок"
+        ok_btn.clicked.connect(self.finish)
+    
+    #слот это в-ция которая реагирует на какоето событие
+    @pyqtSlot()
+    def finish(self):
+        if self.fio is None:
+            return
+        self.accept()       
 
 
+    @property
+    def fio(self):
+        result = self.__fio_edt.text().strip()
+        # if not result:
+        #     return None
+        # return result
+        if result:
+            return result
+    
+    @property
+    def phone(self):
+        result = self.__phone_edt.text().strip()
+        # if not result:
+        #     return None
+        # return result
+        if result:
+            return result
+    
+    @property
+    def comment(self):
+        # toPlainText() выполняет ту же функцию что и text()
+        result = self.__comment_edt.toPlainText().strip()
+        # if not result:
+        #     return None
+        # return result
+        if result:
+            return result
+    
+    @property
+    def email(self):
+        result = self.__email_edt.text().strip()
+        if result:
+            return result
 
 
 
