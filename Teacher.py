@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QTableView, QMessageBox, QDialog
+from PyQt6.QtWidgets import QTableView, QMessageBox, QDialog, QAbstractItemView, QHeaderView
 from PyQt6.QtWidgets import QLabel, QLineEdit, QTextEdit, QPushButton
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt6.QtSql import QSqlQueryModel
@@ -90,7 +90,24 @@ class View(QTableView):
 
         model = Model(parent=self)
         self.setModel(model)
-    
+        
+        # чтобы выбирать всю строку, а не одну ячейку
+        self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        # чтобы убатть возможность выбора нескольких строк
+        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        # чтобы скрыть колонку id
+        self.hideColumn(0)
+        # запретить перенос по пробелу хотя у меня итак не переносилось
+        self.setWordWrap(False)
+        # чтобы нельзя было изменять высоту строк
+        vh = self.verticalHeader()
+        vh.setSectionResizeMode(QHeaderView.ResizeMode.Fixed) 
+        # чтобы длина солбцов подбиралась под содержимое ячеек
+        hh = self.horizontalHeader()
+        hh.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+        # чтобы таблица растянулась по горизонтали за счет четвертой колонки
+        hh.setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch)
+
     @pyqtSlot()
     def add(self):
         # QMessageBox.information(self, 'Учитель', 'Добавление')
