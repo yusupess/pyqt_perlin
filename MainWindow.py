@@ -25,9 +25,7 @@ class MainWindow(QMainWindow):
         # main_menu.student_delete.triggered.connect(v.delete)
         # main_menu.student_edit.triggered.connect(v.update)
 
-        main_menu.stgroup_add.triggered.connect(v.add)
-        main_menu.stgroup_delete.triggered.connect(v.delete)
-        main_menu.stgroup_edit.triggered.connect(v.update)
+        main_menu.set_mode_stgroup(v)
 
     @pyqtSlot()
     def about(self):
