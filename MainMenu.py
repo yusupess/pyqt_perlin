@@ -9,7 +9,6 @@ class MainMenu(QMenuBar):
         super().__init__(parent)
 
         teacher_menu = self.addMenu('Учитель')
-        self.setStyleSheet("QPushButton:disabled { color: gray; }")
         self.__teacher_menu_action = teacher_menu.menuAction()
         self.__teacher_add = teacher_menu.addAction('Добавить')
         self.__teacher_edit = teacher_menu.addAction('Редактировать')
@@ -35,11 +34,9 @@ class MainMenu(QMenuBar):
     def about(self):
         return self.__about
     
-
     @property
     def about_qt(self):
         return self.__about_qt
-    
 
     def set_mode_stgroup(self, widget):
         self.__stgroup_add.triggered.connect(widget.add)
@@ -65,3 +62,54 @@ class MainMenu(QMenuBar):
         self.__teacher_delete.setEnabled(False)
         self.__teacher_menu_action.setEnabled(False)
         self.__teacher_menu_action.setVisible(False)
+
+    def set_mode_student(self, widget):
+        self.__student_add.triggered.connect(widget.add)
+        self.__student_delete.triggered.connect(widget.delete)
+        self.__student_edit.triggered.connect(widget.update)
+
+        self.__stgroup_add.setEnabled(False)
+        self.__stgroup_edit.setEnabled(False)
+        self.__stgroup_delete.setEnabled(False)
+        self.__stgroup_menu_action.setEnabled(False)
+        self.__stgroup_menu_action.setVisible(False)
+
+        self.__student_add.setEnabled(True)
+        self.__student_edit.setEnabled(True)
+        self.__student_delete.setEnabled(True)
+        self.__student_menu_action.setEnabled(True)
+        self.__student_menu_action.setVisible(True)
+
+        self.__teacher_add.setEnabled(False)
+        self.__teacher_edit.setEnabled(False)
+        self.__teacher_delete.setEnabled(False)
+        self.__teacher_menu_action.setEnabled(False)
+        self.__teacher_menu_action.setVisible(False)
+
+
+
+    def set_mode_teacher(self, widget):
+        self.__teacher_add.triggered.connect(widget.add)
+        self.__teacher_delete.triggered.connect(widget.delete)
+        self.__teacher_edit.triggered.connect(widget.update)
+        
+        # просто прятать пункты меню неправильно.
+        # надо обязательно отключить
+        self.__stgroup_add.setEnabled(False)
+        self.__stgroup_edit.setEnabled(False)
+        self.__stgroup_delete.setEnabled(False)
+        self.__stgroup_menu_action.setEnabled(False)
+        self.__stgroup_menu_action.setVisible(False)
+
+        self.__student_add.setEnabled(False)
+        self.__student_edit.setEnabled(False)
+        self.__student_delete.setEnabled(False)
+        self.__student_menu_action.setEnabled(False)
+        self.__student_menu_action.setVisible(False)
+
+        self.__teacher_add.setEnabled(True)
+        self.__teacher_edit.setEnabled(True)
+        self.__teacher_delete.setEnabled(True)
+        self.__teacher_menu_action.setEnabled(True)
+        self.__teacher_menu_action.setVisible(True)
+

@@ -11,7 +11,7 @@ class MainWindow(QMainWindow):
         main_menu = MainMenu(parent=self)
         self.setMenuBar(main_menu)
         
-        v = StGroup.View(parent=self)
+        v = Student.View(parent=self)
         self.setCentralWidget(v)
 
         main_menu.about_qt.triggered.connect(self.about_qt)
@@ -25,7 +25,9 @@ class MainWindow(QMainWindow):
         # main_menu.student_delete.triggered.connect(v.delete)
         # main_menu.student_edit.triggered.connect(v.update)
 
-        main_menu.set_mode_stgroup(v)
+        # main_menu.set_mode_stgroup(v)
+        main_menu.set_mode_student(v)
+        # main_menu.set_mode_teacher(v)
 
     @pyqtSlot()
     def about(self):
