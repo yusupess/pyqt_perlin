@@ -11,11 +11,12 @@ class MainWindow(QMainWindow):
         main_menu = MainMenu(parent=self)
         self.setMenuBar(main_menu)
         
-        v = Student.View(parent=self)
-        self.setCentralWidget(v)
+        # v = Student.View(parent=self)
+        # self.setCentralWidget(v)
 
         main_menu.about_qt.triggered.connect(self.about_qt)
         main_menu.about.triggered.connect(self.about)
+        main_menu.teacher_mode_request.connect(self.teacher_mode_on)
 
         # main_menu.teacher_add.triggered.connect(v.add)
         # main_menu.teacher_delete.triggered.connect(v.delete)
@@ -26,7 +27,7 @@ class MainWindow(QMainWindow):
         # main_menu.student_edit.triggered.connect(v.update)
 
         # main_menu.set_mode_stgroup(v)
-        main_menu.set_mode_student(v)
+        # main_menu.set_mode_student(v)
         # main_menu.set_mode_teacher(v)
 
     @pyqtSlot()
@@ -41,6 +42,22 @@ class MainWindow(QMainWindow):
     def about_qt(self):
         QMessageBox.aboutQt(self, 'Управление заданиями для учащихся')
 
+    # 
+    @pyqtSlot()
+    def teacher_mode_on(self):
+        # сначала надо убрать старое окно
+        # это как раз и есть то окно которое было раньше
+        old = self.centralWidget()
+        # теперь новое окно создаем
+        v = Teacher.View(parent=self)
+        self.setCentralWidget(v)
+        # menu Bar выдает ссылку на главное меню
+        self.menuBar().set_mode_teacher(v)
+        # удаляем старое окно если оно было
+        if old is not None:
+            # deleteLater удаляет само окно после того
+            # когда сигналы все выполнит
+            old.deleteLater()
     
 
     
