@@ -11,10 +11,3 @@ main_window.showMaximized()
 result = app.exec()   # запускает приложение
 sys.exit(result)
 
-
-
-
-
-
-
-
