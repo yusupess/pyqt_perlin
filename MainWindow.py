@@ -2,7 +2,20 @@ from PyQt6.QtWidgets import QMainWindow, QMessageBox
 from PyQt6.QtCore import pyqtSlot
 from MainMenu import MainMenu
 import Teacher, Student, StGroup
-from Login import LoginPassword
+from Login import LoginPassword, ChangePassword, check_password
+import psycopg2
+import settings as st
+from datetime import datetime
+
+
+SELECT_LOGIN = """
+                  select id, f_login, f_password_hash,
+                         f_enabled, f_expire, f_role,
+                         f_salt
+                   from appuser
+                   where f_login = %s ;
+               """
+
 
 class MainWindow(QMainWindow):
 
@@ -19,11 +32,36 @@ class MainWindow(QMainWindow):
         main_menu.stgroup_mode_request.connect(self.stgroup_mode_on)
 
         allowed_flag = False
-        dia = LoginPassword(self)
-        if dia.exec():
-            print("check login and password")
+        self.authorize()
         if not allowed_flag:
             main_menu.lock()
+
+    def authorize(self):
+        dia = LoginPassword(self)
+        if not dia.exec():
+            return False
+        conn = psycopg2.connect(**st.db_params)
+        cursor = conn.cursor()
+        data = (dia.login, )
+        cursor.execute(SELECT_LOGIN, data)
+        data = cursor.fetchone()
+        conn.close()
+        if data is None:
+            return False
+        id_user, login, password_hash, enabled, expire, role, salt = data
+        print(f'id_user= {id_user}, login= {login}')
+        print(f"password_hash = {password_hash}, enabled={enabled}")
+        print(f"expire={expire}, role={role}")
+        if not enabled:
+            return False
+        if expire is not None:
+            if expire < datetime.now():
+                return False
+        if password_hash is None:
+            print("Change password")
+        else:
+            print("check password")
+        return False
 
     @pyqtSlot()
     def about(self):

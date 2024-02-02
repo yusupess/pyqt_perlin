@@ -1,6 +1,9 @@
 """Здесь описано окно для ввода логина и пароля."""
 from PyQt6.QtWidgets import QDialog, QLabel, QPushButton, QLineEdit
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
+from PyQt6.QtCore import pyqtSlot
+import settings as st
+from hashlib import sha1
 
 
 class LoginPassword(QDialog):
@@ -47,8 +50,61 @@ class LoginPassword(QDialog):
 
     @property
     def password(self):
-        return self.__password_edt.text().strip()   
+        return self.__password_edt.text().strip()
 
+def check_password(password, password_hash, salt):
+    check = st.global_salt + password + salt
+    psw_hash = sha1(check).hexdigest()
+    return psw_hash == password_hash
+    
+
+class ChangePassword(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        lay = QVBoxLayout(self)
+
+        lay_first = QVBoxLayout()
+        lay_first.setSpacing(0)
+        lay_first.addWidget(QLabel('Введите новый пароль', parent=self))
+        self.__new_pass1 = QLineEdit(parent=self)
+        self.__new_pass1.setEchoMode(QLineEdit.EchoMode.Password)
+        lay_first.addWidget(self.__new_pass1)
+        lay.addLayout(lay_first)
+
+        lay_second = QVBoxLayout()
+        lay_second.setSpacing(0)
+        lay_second.addWidget(QLabel('Повторите новый пароль', parent=self))
+        self.__new_pass2 = QLineEdit(parent=self)
+        self.__new_pass2.setEchoMode(QLineEdit.EchoMode.Password)
+        lay_second.addWidget(self.__new_pass2)
+        lay.addLayout(lay_second)
+        
+        lay_ok_button = QHBoxLayout()
+        lay_ok_button.addStretch()
+        ok = QPushButton('OK', parent=self)
+        lay_ok_button.addWidget(ok)
+        lay.addLayout(lay_ok_button)
+
+        ok.clicked.connect(self.pass_validate)
+    
+    @property
+    def pswd_frst(self):
+        return self.__new_pass1
+    
+    @property
+    def pswd_scnd(self):
+        return self.__new_pass2
+
+    @pyqtSlot()
+    def pass_validate(self):
+        if self.__new_pass1.text().strip() and self.__new_pass1.text().strip() == self.__new_pass2.text().strip():
+            self.accept()
+            print("accept")
+        else:
+            self.reject()
+            print('reject')
+    
 
 
 
