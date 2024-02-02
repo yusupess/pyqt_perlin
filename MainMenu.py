@@ -9,6 +9,8 @@ class MainMenu(QMenuBar):
     
     # сигнал для передачи главному окну о включении режима учителей
     teacher_mode_request = pyqtSignal()
+    student_mode_request = pyqtSignal()
+    stgroup_mode_request = pyqtSignal()
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -33,29 +35,42 @@ class MainMenu(QMenuBar):
 
         mode_menu = self.addMenu('Режимы')
         mode_action_group = ag = QActionGroup(self)
+        self.__mode_menu_action = mode_menu.menuAction()
         self.__teacher_mode_action = act = mode_menu.addAction('Учителя')
         act.setCheckable(True)
         # для того чтобы сделать режим переключение, 
         # т.е при выборе другого подменю галочка на этом пропадет
         ag.addAction(act)
         act.toggled.connect(self.toggle_teacher_mode)
+        # для того чтобы кнопка учитель не отображадась при старте приложения
+        self.toggle_teacher_mode(False) # i ya dobavil
         self.__student_mode_action = act = mode_menu.addAction('Студенты')
         act.setCheckable(True)
         ag.addAction(act)
+        # для того чтобы кнопка ученик не отображадась при старте приложения
+        self.toggle_student_mode(False) # i ya dobavil
         act.toggled.connect(self.toggle_student_mode)
         self.__stgroup_mode_action = act = mode_menu.addAction('Группы')
         act.setCheckable(True)
         ag.addAction(act)
+        # для того чтобы кнопка группы не отображадась при старте приложения
+        self.toggle_stgroup_mode(False) # i ya dobavil
         act.toggled.connect(self.toggle_stgroup_mode)   
 
         help_menu = self.addMenu('Справка')
         self.__about = help_menu.addAction('О программе...')
         self.__about_qt = help_menu.addAction('О библиотеке Qt...')
+
+    # функция для блокировки меню в случае непраильного логина\пароля
+    def lock(self):
+        self.__mode_menu_action.setEnabled(False)
     
     @pyqtSlot(bool)
     def toggle_teacher_mode(self, enable):
         print(f'Teacher={enable}')
         if not enable:
+            # просто прятать пункты меню неправильно.
+            # надо обязательно отключить
             self.__teacher_add.setEnabled(False)
             self.__teacher_edit.setEnabled(False)
             self.__teacher_delete.setEnabled(False)
@@ -68,11 +83,30 @@ class MainMenu(QMenuBar):
     @pyqtSlot(bool)
     def toggle_student_mode(self, enable):
         print(f'Student={enable}')
+        if not enable:
+            self.__student_add.setEnabled(False)
+            self.__student_edit.setEnabled(False)
+            self.__student_delete.setEnabled(False)
+            self.__student_menu_action.setEnabled(False)
+            self.__student_menu_action.setVisible(False)
+        else:
+            # создаем сигнал при включении режима учителя
+            self.student_mode_request.emit()
     
     @pyqtSlot(bool)
     def toggle_stgroup_mode(self, enable):
         print(f'StGroup={enable}')
+        if not enable:
+            self.__stgroup_add.setEnabled(False)
+            self.__stgroup_edit.setEnabled(False)
+            self.__stgroup_delete.setEnabled(False)
+            self.__stgroup_menu_action.setEnabled(False)
+            self.__stgroup_menu_action.setVisible(False)
 
+        else:
+            # создаем сигнал при включении режима учителя
+            self.stgroup_mode_request.emit()
+    
     @property
     def about(self):
         return self.__about
@@ -86,30 +120,16 @@ class MainMenu(QMenuBar):
         self.__stgroup_delete.triggered.connect(widget.delete)
         self.__stgroup_edit.triggered.connect(widget.update)
         
-        # просто прятать пункты меню неправильно.
-        # надо обязательно отключить
         self.__stgroup_add.setEnabled(True)
         self.__stgroup_edit.setEnabled(True)
         self.__stgroup_delete.setEnabled(True)
         self.__stgroup_menu_action.setEnabled(True)
         self.__stgroup_menu_action.setVisible(True)
 
-        self.__student_add.setEnabled(False)
-        self.__student_edit.setEnabled(False)
-        self.__student_delete.setEnabled(False)
-        self.__student_menu_action.setEnabled(False)
-        self.__student_menu_action.setVisible(False)
-
     def set_mode_student(self, widget):
         self.__student_add.triggered.connect(widget.add)
         self.__student_delete.triggered.connect(widget.delete)
         self.__student_edit.triggered.connect(widget.update)
-
-        self.__stgroup_add.setEnabled(False)
-        self.__stgroup_edit.setEnabled(False)
-        self.__stgroup_delete.setEnabled(False)
-        self.__stgroup_menu_action.setEnabled(False)
-        self.__stgroup_menu_action.setVisible(False)
 
         self.__student_add.setEnabled(True)
         self.__student_edit.setEnabled(True)
@@ -121,20 +141,6 @@ class MainMenu(QMenuBar):
         self.__teacher_add.triggered.connect(widget.add)
         self.__teacher_delete.triggered.connect(widget.delete)
         self.__teacher_edit.triggered.connect(widget.update)
-        
-        # просто прятать пункты меню неправильно.
-        # надо обязательно отключить
-        self.__stgroup_add.setEnabled(False)
-        self.__stgroup_edit.setEnabled(False)
-        self.__stgroup_delete.setEnabled(False)
-        self.__stgroup_menu_action.setEnabled(False)
-        self.__stgroup_menu_action.setVisible(False)
-
-        self.__student_add.setEnabled(False)
-        self.__student_edit.setEnabled(False)
-        self.__student_delete.setEnabled(False)
-        self.__student_menu_action.setEnabled(False)
-        self.__student_menu_action.setVisible(False)
 
         self.__teacher_add.setEnabled(True)
         self.__teacher_edit.setEnabled(True)
