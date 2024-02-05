@@ -3,6 +3,7 @@ from PyQt6.QtCore import pyqtSlot
 from MainMenu import MainMenu
 import Teacher, Student, StGroup
 from Login import LoginPassword, ChangePassword, check_password
+from Login import password_hash
 import psycopg2
 import settings as st
 from datetime import datetime
@@ -15,6 +16,9 @@ SELECT_LOGIN = """
                    from appuser
                    where f_login = %s ;
                """
+
+UPDATE_PHASH = """update appuser set f_password_hash = %s
+                  where id = %s ;"""
 
 
 class MainWindow(QMainWindow):
@@ -31,9 +35,7 @@ class MainWindow(QMainWindow):
         main_menu.student_mode_request.connect(self.student_mode_on)
         main_menu.stgroup_mode_request.connect(self.stgroup_mode_on)
 
-        allowed_flag = False
-        self.authorize()
-        if not allowed_flag:
+        if not self.authorize():
             main_menu.lock()
 
     def authorize(self):
@@ -48,20 +50,29 @@ class MainWindow(QMainWindow):
         conn.close()
         if data is None:
             return False
-        id_user, login, password_hash, enabled, expire, role, salt = data
+        id_user, login, pwd_hash, enabled, expire, role, salt = data
         print(f'id_user= {id_user}, login= {login}')
-        print(f"password_hash = {password_hash}, enabled={enabled}")
+        print(f"password_hash = {pwd_hash}, enabled={enabled}")
         print(f"expire={expire}, role={role}")
         if not enabled:
             return False
         if expire is not None:
             if expire < datetime.now():
                 return False
-        if password_hash is None:
-            print("Change password")
+        if pwd_hash is None:
+            if dia.password is not None:
+                return False
+            dia2 = ChangePassword(parent=self)
+            if not dia2.exec():
+                return False
+            data = (password_hash(dia2.password, salt), id_user)
+            conn = psycopg2.connect(**st.db_params)
+            cursor = conn.cursor()
+            cursor.execute(UPDATE_PHASH, data)
         else:
-            print("check password")
-        return False
+            if not check_password(dia.password, pwd_hash, salt):
+                return False
+        return True
 
     @pyqtSlot()
     def about(self):
