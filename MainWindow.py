@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow, QMessageBox
+from PyQt6.QtWidgets import QMainWindow, QMessageBox, QApplication
 from PyQt6.QtCore import pyqtSlot
 from MainMenu import MainMenu
 import Teacher, Student, StGroup
@@ -51,9 +51,9 @@ class MainWindow(QMainWindow):
         if data is None:
             return False
         id_user, login, pwd_hash, enabled, expire, role, salt = data
-        print(f'id_user= {id_user}, login= {login}')
-        print(f"password_hash = {pwd_hash}, enabled={enabled}")
-        print(f"expire={expire}, role={role}")
+        # print(f'id_user= {id_user}, login= {login}')
+        # print(f"password_hash = {pwd_hash}, enabled={enabled}")
+        # print(f"expire={expire}, role={role}")
         if not enabled:
             return False
         if expire is not None:
@@ -69,9 +69,13 @@ class MainWindow(QMainWindow):
             conn = psycopg2.connect(**st.db_params)
             cursor = conn.cursor()
             cursor.execute(UPDATE_PHASH, data)
+            # строчка для сохранения обновления в базе данных
+            conn.commit()
+            conn.close()
         else:
             if not check_password(dia.password, pwd_hash, salt):
                 return False
+        QApplication.instance().set_authorized(login, role)
         return True
 
     @pyqtSlot()

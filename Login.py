@@ -101,6 +101,7 @@ class ChangePassword(QDialog):
         return result
 
 def check_password(password, pwd_hash, salt):
+    print(f"Проверка пароля. {password_hash(password, salt)} {pwd_hash}")
     return password_hash(password, salt) == pwd_hash
 
 

@@ -9,6 +9,9 @@ class Application(QApplication):
     def __init__(self, argv):
         super().__init__(argv)
 
+        self.__login = None
+        self.__role = None
+
         db = QSqlDatabase.addDatabase('QPSQL') # QPSQL это если посгрессу
         db.setHostName(st.db_params['host'])
         db.setDatabaseName(st.db_params['dbname'])
@@ -20,4 +23,16 @@ class Application(QApplication):
             print('Connected to database', file=sys.stderr)
         else:
             print('Connection FAILED', file=sys.stderr)
+
+    @property
+    def login(self):
+        return self.__login
+    
+    @property
+    def role(self):
+        return self.__role
+    
+    def set_authorized(self, login, role):
+        self.__login = login
+        self.__role = role
 
