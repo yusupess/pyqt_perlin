@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QMainWindow, QMessageBox, QApplication
 from PyQt6.QtCore import pyqtSlot
 from MainMenu import MainMenu
-import Teacher, Student, StGroup
+import Teachers, Student, StGroup
 from Login import LoginPassword, ChangePassword, check_password
 from Login import password_hash
 import psycopg2
@@ -95,7 +95,7 @@ class MainWindow(QMainWindow):
         # это как раз и есть то окно которое было раньше
         old = self.centralWidget()
         # теперь новое окно создаем
-        v = Teacher.View(parent=self)
+        v = Teachers.View(parent=self)
         self.setCentralWidget(v)
         # menu Bar выдает ссылку на главное меню
         self.menuBar().set_mode_teacher(v)
