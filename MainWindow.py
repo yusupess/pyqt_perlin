@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QMainWindow, QMessageBox, QApplication
 from PyQt6.QtCore import pyqtSlot
 from MainMenu import MainMenu
-import Teachers, Student, StGroup
+import Teachers, Students, StGroup
 from Login import LoginPassword, ChangePassword, check_password
 from Login import password_hash
 import psycopg2
@@ -108,7 +108,7 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def student_mode_on(self):
         old = self.centralWidget()
-        v = Student.View(parent=self)
+        v = Students.View(parent=self)
         self.setCentralWidget(v)
         self.menuBar().set_mode_student(v)
         if old is not None:
