@@ -1,8 +1,18 @@
 from PyQt6.QtWidgets import QDialog
+from PyQt6.QtWidgets import QFrame
 from PyQt6.QtWidgets import QLabel, QLineEdit, QTextEdit, QPushButton
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt6.QtCore import pyqtSlot
 
+from .Ui_StudentFrame import Ui_StudentFrame
+
+class _Frame(QFrame):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.ui = Ui_StudentFrame()
+        self.ui.setupUi(self)
 
 class Dialog(QDialog):
 
@@ -10,14 +20,7 @@ class Dialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle('Ученик')
 
-        fio_lbl = QLabel('Фамилия И. О.', parent=self)
-        self.__fio_edt = QLineEdit(parent=self)
-        
-        email_lbl = QLabel('e-mail', parent=self)
-        self.__email_edt = QLineEdit(parent=self)
-
-        comment_lbl = QLabel('Примечание', parent=self)
-        self.__comment_edt = QTextEdit(parent=self)
+        self.__frame = _Frame(parent=self)
 
         ok_btn = QPushButton('OK', parent=self)
         cancel_btn = QPushButton('Отмена', parent=self)
@@ -25,26 +28,9 @@ class Dialog(QDialog):
         lay = QVBoxLayout(self)
         lay.setSpacing(15)
 
-        lay_fam = QVBoxLayout()
-        # наводим красоту. устанавливаем расстояние м\у элементами
-        lay_fam.setSpacing(0)
-        lay_fam.addWidget(fio_lbl)
-        lay_fam.addWidget(self.__fio_edt)
-        lay.addLayout(lay_fam)
+        lay.addWidget(self.__frame)
 
-        
-        lay_em = QVBoxLayout()
-        lay_em.setSpacing(0)
-        lay_em.addWidget(email_lbl)
-        lay_em.addWidget(self.__email_edt)
-        lay.addLayout(lay_em)
-        
 
-        lay_com = QVBoxLayout()
-        lay_com.setSpacing(0)
-        lay_com.addWidget(comment_lbl)
-        lay_com.addWidget(self.__comment_edt)
-        lay.addLayout(lay_com)
         
         # горизонтальный слой для кнопок "ОК" и "Отмена"
         lay2 = QHBoxLayout()
@@ -68,7 +54,7 @@ class Dialog(QDialog):
 
     @property
     def fio(self):
-        result = self.__fio_edt.text().strip()
+        result = self.__frame.ui.fio_edt.text().strip()
         # if not result:
         #     return None
         # return result
@@ -77,12 +63,12 @@ class Dialog(QDialog):
     
     @fio.setter
     def fio(self, value):
-        self.__fio_edt.setText(value)
+        self.__frame.ui.fio_edt.setText(value)
     
     @property
     def comment(self):
         # toPlainText() выполняет ту же функцию что и text()
-        result = self.__comment_edt.toPlainText().strip()
+        result = self.__frame.ui.comment_edt.toPlainText().strip()
         # if not result:
         #     return None
         # return result
@@ -91,16 +77,25 @@ class Dialog(QDialog):
     
     @comment.setter
     def comment(self, value):
-        self.__comment_edt.setPlainText(value)
+        self.__frame.ui.comment_edt.setPlainText(value)
 
     @property
     def email(self):
-        result = self.__email_edt.text().strip()
+        result = self.__frame.ui.email_edt.text().strip()
         if result:
             return result
         
     @email.setter
     def email(self, value):
-        self.__email_edt.setText(value)
+        self.__frame.ui.email_edt.setText(value)
 
+    @property
+    def login(self):
+        result = self.__frame.ui.login_edt.text().strip()
+        if result:
+            return result
+        
+    @login.setter
+    def login(self, value):
+        self.__frame.ui.login_edt.setText(value)
         

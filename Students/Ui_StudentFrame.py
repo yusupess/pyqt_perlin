@@ -14,6 +14,7 @@ class Ui_StudentFrame(object):
         StudentFrame.setObjectName("StudentFrame")
         StudentFrame.resize(492, 225)
         self.verticalLayout = QtWidgets.QVBoxLayout(StudentFrame)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
         self.lay_line1 = QtWidgets.QHBoxLayout()
         self.lay_line1.setObjectName("lay_line1")
