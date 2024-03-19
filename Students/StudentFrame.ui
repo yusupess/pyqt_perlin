@@ -1,31 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TeacherFrame</class>
- <widget class="QFrame" name="TeacherFrame">
+ <class>StudentFrame</class>
+ <widget class="QFrame" name="StudentFrame">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>536</width>
-    <height>411</height>
+    <width>492</width>
+    <height>225</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Frame</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
    <item>
     <layout class="QHBoxLayout" name="lay_line1" stretch="1,2">
      <item>
@@ -65,42 +53,24 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="lay_line2">
+    <layout class="QVBoxLayout" name="lay_email">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item>
-      <layout class="QVBoxLayout" name="lay_phone">
-       <property name="spacing">
-        <number>0</number>
+      <widget class="QLabel" name="email_lbl">
+       <property name="text">
+        <string>e-mail</string>
        </property>
-       <item>
-        <widget class="QLabel" name="phone_lbl">
-         <property name="text">
-          <string>phone</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="phone_edt"/>
-       </item>
-      </layout>
+      </widget>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="lay_email">
-       <item>
-        <widget class="QLabel" name="email_lbl">
-         <property name="text">
-          <string>email</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="email_edt"/>
-       </item>
-      </layout>
+      <widget class="QLineEdit" name="email_edt"/>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="lay_comment">
+    <layout class="QVBoxLayout" name="lay_comment" stretch="0,0">
      <property name="spacing">
       <number>0</number>
      </property>
