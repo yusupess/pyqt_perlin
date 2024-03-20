@@ -9,9 +9,9 @@ SELECT_ALL = """select id, f_fio, f_phone, f_email,
                  f_comment from teacher;"""
 
 # команда для вставки новой строчки в базу данных
-INSERT = """insert into teacher ( f_fio, f_phone, f_email, f_comment )
-         values ( %s, %s, %s, %s ) ;         
-"""
+# INSERT = """insert into teacher ( f_fio, f_phone, f_email, f_comment )
+#          values ( %s, %s, %s, %s ) ;         
+# """
 
 SELECT_ONE = """select f_fio, f_phone, f_email, f_comment
                 from teacher
@@ -40,25 +40,25 @@ class Model(QSqlQueryModel):
     def obnovit(self):
         self.setQuery(SELECT_ALL)
 
-    def add(self, fio, phone, email, comment):
-        conn = psycopg2.connect(host=st.db_params['host'],
-                                port=st.db_params['port'],
-                                dbname=st.db_params['dbname'],
-                                user=st.db_params['user'],
-                                password=st.db_params['password'],
-                                )
-        # строчку выше можно записать следующим образом
-        # так как поля в сеттингс и ключи совпадают по написанию
-        # conn = psycopg2.connect(**st.db_params)
-        # вспомогательный обект курсор которй непосредственно отправляет
-        # команду в базу данных  и получает оттуда ответ
-        cursor = conn.cursor()
-        data = (fio, phone, email, comment)
-        cursor.execute(INSERT, data)
-        # чтобы сохранить данные в БД вызываем коммит
-        conn.commit()
-        conn.close()
-        self.obnovit()
+    # def add(self, fio, phone, email, comment):
+    #     conn = psycopg2.connect(host=st.db_params['host'],
+    #                             port=st.db_params['port'],
+    #                             dbname=st.db_params['dbname'],
+    #                             user=st.db_params['user'],
+    #                             password=st.db_params['password'],
+    #                             )
+    #     # строчку выше можно записать следующим образом
+    #     # так как поля в сеттингс и ключи совпадают по написанию
+    #     # conn = psycopg2.connect(**st.db_params)
+    #     # вспомогательный обект курсор которй непосредственно отправляет
+    #     # команду в базу данных  и получает оттуда ответ
+    #     cursor = conn.cursor()
+    #     data = (fio, phone, email, comment)
+    #     cursor.execute(INSERT, data)
+    #     # чтобы сохранить данные в БД вызываем коммит
+    #     conn.commit()
+    #     conn.close()
+    #     self.obnovit()
 
     def update(self, id_teacher, fio, phone, email, comment):
         conn = psycopg2.connect(**st.db_params)

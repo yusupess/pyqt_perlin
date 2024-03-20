@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QFrame
 from PyQt6.QtWidgets import QLabel, QLineEdit, QTextEdit, QPushButton
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt6.QtCore import pyqtSlot
+import db
 
 from .Ui_TeacherFrame import Ui_TeacherFrame
 
@@ -119,3 +120,19 @@ class Dialog(QDialog):
     @login.setter
     def login(self, value):
         self.__frame.ui.login_edt.setText(value)
+
+    def get(self, data: db.Teacher):
+        data.login = self.login
+        data.fio = self.fio
+        data.phone = self.phone
+        data.email = self.email
+        data.comment = self.comment
+    
+    def put(self, data):
+        self.login = data.login
+        self.fio = data.fio
+        self.phone = data.phone
+        self.email = data.email
+        self.comment = data.comment
+        
+

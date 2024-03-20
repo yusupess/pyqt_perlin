@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QTableView, QMessageBox, QAbstractItemView, QHeaderView
 from PyQt6.QtCore import pyqtSlot
 import settings as st
+import db
 import psycopg2
 
 from .Model import Model
@@ -43,7 +44,10 @@ class View(QTableView):
         # QMessageBox.information(self, 'Учитель', 'Добавление')
         dia = Dialog(parent=self)
         if dia.exec():
-            self.model().add(dia.fio, dia.phone, dia.email, dia.comment)
+            data = db.Teacher()
+            dia.get(data)
+            data.insert()  # Эту функцию надо вызывать чуть иначе
+            self.model().obnovit()
 
     @pyqtSlot()
     def update(self):
