@@ -4,3 +4,5 @@ db_params = {'host': 'localhost',
              'dbname': 'tester2',
              'password': 'yusup',
              }
+
+global_salt = 'ouigogu!!oijhvk8rkP'
