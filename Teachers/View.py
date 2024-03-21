@@ -38,6 +38,11 @@ class View(QTableView):
         hh.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         # чтобы таблица растянулась по горизонтали за счет четвертой колонки
         hh.setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch)
+    
+    @property
+    def pk(self):
+        row = self.currentIndex().row()
+        return self.model().record(row).value(0)
 
     @pyqtSlot()
     def add(self):
@@ -52,23 +57,21 @@ class View(QTableView):
     @pyqtSlot()
     def update(self):
         dia = Dialog(parent=self)
-        row = self.currentIndex().row()
-        id_teacher = self.model().record(row).value(0)
+        data = db.Teacher(pk = self.pk).load()
+        dia.put(data)
         # подключаемся к базе данных
-        conn = psycopg2.connect(**st.db_params)
-        # создаем курсор
-        cursor = conn.cursor()
-        data = (id_teacher,)
-        cursor.execute(SELECT_ONE, data)
-        # считываем строку из базы даных и записываем в строки диалогового окна
-        dia.fio, dia.phone, dia.email, dia.comment = cursor.fetchone()
-        # после счиьываения обязательно закываем подключение к базе
-        conn.close()
+        # conn = psycopg2.connect(**st.db_params)
+        # # создаем курсор
+        # cursor = conn.cursor()
+        # data = (id_teacher,)
+        # cursor.execute(SELECT_ONE, data)
+        # # считываем строку из базы даных и записываем в строки диалогового окна
+        # dia.fio, dia.phone, dia.email, dia.comment = cursor.fetchone()
+        # # после счиьываения обязательно закываем подключение к базе
+        # conn.close()
         if dia.exec():
-            self.model().update(id_teacher, dia.fio,
-                                dia.phone, dia.email,
-                                dia.comment
-                                )
+            dia.get(data)
+            print(data)
 
     @pyqtSlot()
     def delete(self):

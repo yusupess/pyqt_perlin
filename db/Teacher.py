@@ -14,6 +14,14 @@ INSERT_TEACHER = """
     returning id ;
     """
 
+SELECT_ONE = """select u.f_login, t.f_fio,
+                    t.f_phone, t.f_email,
+                    t.f_comment, t.id_user
+                from appuser as u
+                inner join teacher as t
+                on u.id = t.id_user
+                where t.id = %s ;"""
+
 @dataclass
 class Teacher(object):
 
@@ -44,4 +52,16 @@ class Teacher(object):
         (self.pk, ) = next(cursor)
         conn.commit()
         conn.close()
+
+    def load(self):
+        conn = psycopg2.connect(**st.db_params)
+        cursor = conn.cursor()
+        cursor.execute(SELECT_ONE, (self.pk,))
+        (self.login, self.fio, self.phone, self.email,
+         self.comment, self.id_user) = next(cursor)
+        conn.commit()
+        conn.close()
+        return self
+
+
     

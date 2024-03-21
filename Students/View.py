@@ -5,6 +5,7 @@ import psycopg2
 
 from .Model import Model
 from .Dialog import Dialog
+import db
 
 SELECT_ONE = """select f_fio, f_email, f_comment
                 from student
@@ -30,13 +31,21 @@ class View(QTableView):
         hh = self.horizontalHeader()
         hh.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
+    
+    @property
+    def pk(self):
+        row = self.currentIndex().row()
+        return self.model().record(row).value(0)
 
     @pyqtSlot()
     def add(self):
         # QMessageBox.information(self, 'Учитель', 'Добавление')
         dia = Dialog(parent=self)
         if dia.exec():
-            self.model().add(dia.fio, dia.email, dia.comment)
+            data = db.Student()
+            dia.get(data)
+            data.insert()  # Эту функцию надо вызывать чуть иначе
+            self.model().obnovit()
 
 
     @pyqtSlot()

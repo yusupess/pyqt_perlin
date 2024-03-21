@@ -31,14 +31,14 @@ class Model(QSqlQueryModel):
                  f_comment from student;"""
         self.setQuery(sql)
 
-    def add(self, fio, email, comment):
-        conn = psycopg2.connect(**st.db_params)
-        cursor = conn.cursor()
-        data = (fio, email, comment)
-        cursor.execute(INSERT, data)
-        conn.commit()
-        conn.close()
-        self.obnovit()
+    # def add(self, fio, email, comment):
+    #     conn = psycopg2.connect(**st.db_params)
+    #     cursor = conn.cursor()
+    #     data = (fio, email, comment)
+    #     cursor.execute(INSERT, data)
+    #     conn.commit()
+    #     conn.close()
+    #     self.obnovit()
 
     def update(self, id_student, fio, email, comment):
         conn = psycopg2.connect(**st.db_params)
