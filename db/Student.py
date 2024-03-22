@@ -8,11 +8,20 @@ INSERT_USER = """
     returning id ;
     """
 
-INSERT_TEACHER = """
+INSERT_STUDENT = """
     insert into student ( f_fio, f_email, f_comment, id_user )
     values( %s, %s, %s, %s)
     returning id ;
     """
+
+SELECT_ONE = """select u.f_login, t.f_fio,
+                    t.f_email,
+                    t.f_comment, t.id_user
+                from appuser as u
+                inner join student as t
+                on u.id = t.id_user
+                where t.id = %s ;"""
+
 
 @dataclass
 class Student(object):
@@ -29,7 +38,7 @@ class Student(object):
         return (self.login, '1')
     
     @property
-    def teacher_data(self):
+    def student_data(self):
         return ( self.fio, self.email,
                 self.comment, self.id_user)
 
@@ -39,7 +48,17 @@ class Student(object):
         # data = (self.fio, self.phone, self.email, self.comment, self.id_user)
         cursor.execute(INSERT_USER, self.user_data)
         (self.id_user, ) = next(cursor)
-        cursor.execute(INSERT_TEACHER, self.teacher_data)
+        cursor.execute(INSERT_STUDENT, self.teacher_data)
         (self.pk, ) = next(cursor)
         conn.commit()
         conn.close()
+
+    def load(self):
+        conn = psycopg2.connect(**st.db_params)
+        cursor = conn.cursor()
+        cursor.execute(SELECT_ONE, (self.pk,))
+        (self.login, self.fio, self.email,
+         self.comment, self.id_user) = next(cursor)
+        conn.commit()
+        conn.close()
+        return self

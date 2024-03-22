@@ -50,23 +50,30 @@ class View(QTableView):
 
     @pyqtSlot()
     def update(self):
+        # dia = Dialog(parent=self)
+        # row = self.currentIndex().row()
+        # id_student = self.model().record(row).value(0)
+        # # подключаемся к базе данных
+        # conn = psycopg2.connect(**st.db_params)
+        # # создаем курсор
+        # cursor = conn.cursor()
+        # data = (id_student,)
+        # cursor.execute(SELECT_ONE, data)
+        # # считываем строку из базы даных и записываем в строки диалогового окна
+        # dia.fio, dia.email, dia.comment = cursor.fetchone()
+        # # после счиьываения обязательно закываем подключение к базе
+        # conn.close()
+        # if dia.exec():
+        #     self.model().update(id_student, dia.fio,
+        #                         dia.email, dia.comment
+        #                         )
         dia = Dialog(parent=self)
-        row = self.currentIndex().row()
-        id_student = self.model().record(row).value(0)
-        # подключаемся к базе данных
-        conn = psycopg2.connect(**st.db_params)
-        # создаем курсор
-        cursor = conn.cursor()
-        data = (id_student,)
-        cursor.execute(SELECT_ONE, data)
-        # считываем строку из базы даных и записываем в строки диалогового окна
-        dia.fio, dia.email, dia.comment = cursor.fetchone()
-        # после счиьываения обязательно закываем подключение к базе
-        conn.close()
+        data = db.Student(pk = self.pk).load()
+        dia.put(data)
         if dia.exec():
-            self.model().update(id_student, dia.fio,
-                                dia.email, dia.comment
-                                )
+            dia.get(data)
+            print(data)
+
 
     @pyqtSlot()
     def delete(self):
