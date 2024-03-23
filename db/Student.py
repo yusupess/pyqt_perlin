@@ -14,6 +14,14 @@ INSERT_STUDENT = """
     returning id ;
     """
 
+UPDATE_STUDENT = """
+    update student set
+        f_fio = %s,
+        f_email = %s,
+        f_comment = %s
+        where id = %s ;
+"""
+
 SELECT_ONE = """select u.f_login, t.f_fio,
                     t.f_email,
                     t.f_comment, t.id_user
@@ -41,6 +49,12 @@ class Student(object):
     def student_data(self):
         return ( self.fio, self.email,
                 self.comment, self.id_user)
+    
+    @property
+    def student_upd_data(self):
+        # вспомогательное свойство
+        return (self.fio, self.email,
+                self.comment, self.pk)
 
     def insert(self):
         conn = psycopg2.connect(**st.db_params)
@@ -52,6 +66,25 @@ class Student(object):
         (self.pk, ) = next(cursor)
         conn.commit()
         conn.close()
+
+    def update(self):
+        # обновление данных в БД
+        conn = psycopg2.connect(**st.db_params)
+        try:
+            with conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(UPDATE_STUDENT, self.student_upd_data)
+        finally:
+            conn.close()
+
+    def save(self):
+        # если пк равен None это значт что студент только создается ведб пк присваивает БД
+        # а если пк есть значит мы делаем изменение в уже существующей записи
+        if self.pk is None:
+            return self.insert()
+        else:
+            return self.update()
+
 
     def load(self):
         conn = psycopg2.connect(**st.db_params)

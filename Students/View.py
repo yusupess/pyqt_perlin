@@ -44,7 +44,7 @@ class View(QTableView):
         if dia.exec():
             data = db.Student()
             dia.get(data)
-            data.insert()  # Эту функцию надо вызывать чуть иначе
+            data.save()
             self.model().obnovit()
 
 
@@ -69,10 +69,12 @@ class View(QTableView):
         #                         )
         dia = Dialog(parent=self)
         data = db.Student(pk = self.pk).load()
-        dia.put(data)
+        dia.put(data, for_update=True)
         if dia.exec():
             dia.get(data)
-            print(data)
+            data.save()
+            self.model().obnovit()
+
 
 
     @pyqtSlot()

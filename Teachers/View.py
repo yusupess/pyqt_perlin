@@ -51,14 +51,14 @@ class View(QTableView):
         if dia.exec():
             data = db.Teacher()
             dia.get(data)
-            data.insert()  # Эту функцию надо вызывать чуть иначе
+            data.save()  
             self.model().obnovit()
 
     @pyqtSlot()
     def update(self):
         dia = Dialog(parent=self)
         data = db.Teacher(pk = self.pk).load()
-        dia.put(data)
+        dia.put(data, for_update=True)
         # подключаемся к базе данных
         # conn = psycopg2.connect(**st.db_params)
         # # создаем курсор
@@ -71,7 +71,8 @@ class View(QTableView):
         # conn.close()
         if dia.exec():
             dia.get(data)
-            print(data)
+            data.save()
+            self.model().obnovit()
 
     @pyqtSlot()
     def delete(self):
