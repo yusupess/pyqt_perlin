@@ -1,0 +1,5 @@
+# нужно описать как гит должен раюотать с определенными файлами
+# *.py text diff=python
+# *.jpg binary
+# *.odt binary
+# *.ui binary

@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
+# т.к. слеша нет вначале то игнорирует во всех подпапках
+__pycache__/ 
 *.py[cod]
 *$py.class
 
