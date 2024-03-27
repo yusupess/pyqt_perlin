@@ -1,3 +1,4 @@
+START TRANSACTION;
 /*------------------------------------------------------------*/
 
 create type user_role as enum ('admin', 'student', 'teacher');
@@ -39,8 +40,8 @@ create table teacher (
     id_user int not null references appuser("id")
 );
 
-comment on table teacher is "Сведения о преподователях";
-comment on column teacher.f_phone is "номер телефона";
+comment on table teacher is 'Сведения о преподователях';
+comment on column teacher.f_phone is 'номер телефона';
 
 /*----------------------------------------------------------------*/
 
@@ -49,18 +50,19 @@ create table student (
     id_user int not null references appuser("id")
 );
 
-comment on table student is "Сведения об учениках";
+comment on table student is 'Сведения об учениках';
 
 /*----------------------------------------------------------------*/
 
 create table stgroup(
-    'id' serial not null primary key,
+    "id" serial not null primary key,
     f_title text not null,
     f_comment text
 );
 
 comment on table stgroup is 'Группы студентов';
-comment on column stgroup.f_title is "наименование группы";
+comment on column stgroup.f_title is 'наименование группы';
 comment on column stgroup.f_comment is 'примечание';
 
 /*----------------------------------------------------------------*/
+COMMIT TRANSACTION ;
