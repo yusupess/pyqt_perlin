@@ -1,3 +1,5 @@
+-- скрипт для наката базы данных. По принципу все или ничего. Также создается пользователь АДМИН.
+
 START TRANSACTION;
 /*------------------------------------------------------------*/
 
@@ -65,4 +67,8 @@ comment on column stgroup.f_title is 'наименование группы';
 comment on column stgroup.f_comment is 'примечание';
 
 /*----------------------------------------------------------------*/
+insert into appuser (f_login, f_enabled, f_role, f_fio)
+    values ('admin', true, 'admin', 'Иванов Иван Иванович');
+
+
 COMMIT TRANSACTION ;
