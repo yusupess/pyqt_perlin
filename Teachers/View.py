@@ -7,6 +7,10 @@ import psycopg2
 from .Model import Model
 from .Dialog import Dialog
 
+import logging
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.DEBUG)
+
 
 SELECT_ONE = """select f_fio, f_phone, f_email, f_comment
                 from teacher
@@ -19,8 +23,12 @@ class View(QTableView):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        LOG.debug('Creating Teacher.View')
+
         model = Model(parent=self)
         self.setModel(model)
+
+        LOG.debug('Creating Teacher.View: Model Installed')
         
         # чтобы выбирать всю строку, а не одну ячейку
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
@@ -38,6 +46,8 @@ class View(QTableView):
         hh.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         # чтобы таблица растянулась по горизонтали за счет четвертой колонки
         hh.setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch)
+
+        LOG.debug("Creating Studentd.View: Finishwd")
     
     @property
     def pk(self):
