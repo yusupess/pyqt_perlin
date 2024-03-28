@@ -1,0 +1,5 @@
+START TRANSACTION;
+
+drop view v_student;
+
+COMMIT TRANSACTION;
