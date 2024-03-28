@@ -3,8 +3,12 @@ from PyQt6.QtCore import pyqtSlot
 import settings as st
 import psycopg2
 
+from exceptions import MyQtSqlModelError
 import logging
 # __name__ это имя текущего модуля
+# далее когда ошибка появится - ERROR:Students.Model:ERROR:  column "f_fio" does not exist
+# Students.Model  - эта запись как раз таки изза указанного __name__, 
+# а иначе ошибка бы выглядeла - ERROR:root:ERROR:  column "f_fio" does not exist
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.DEBUG)
 
@@ -32,14 +36,15 @@ class Model(QSqlQueryModel):
         self.obnovit()
 
     def obnovit(self):
-        sql = """select id, f_fio, f_email,
-                 f_comment from student;"""
+        sql = """select pk, f_fio, f_email,
+                 f_comment from v_student;"""
         self.setQuery(sql)
         if self.lastError().isValid():
             err_text = self.lastError().text()
             LOG.error(err_text)
+            raise MyQtSqlModelError(err_text)
         else:
-            LOG.info("Studentd qeery OK")
+            LOG.info("Student query OK")
 
     # def add(self, fio, email, comment):
     #     conn = psycopg2.connect(**st.db_params)

@@ -1,0 +1,2 @@
+class MyQtSqlModelError(Exception):
+    pass
