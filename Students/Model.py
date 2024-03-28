@@ -3,6 +3,11 @@ from PyQt6.QtCore import pyqtSlot
 import settings as st
 import psycopg2
 
+import logging
+# __name__ это имя текущего модуля
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.DEBUG)
+
 
 INSERT = """insert into student ( f_fio, f_email, f_comment )
          values ( %s, %s, %s ) ;         
@@ -30,6 +35,11 @@ class Model(QSqlQueryModel):
         sql = """select id, f_fio, f_email,
                  f_comment from student;"""
         self.setQuery(sql)
+        if self.lastError().isValid():
+            err_text = self.lastError().text()
+            LOG.error(err_text)
+        else:
+            LOG.info("Studentd qeery OK")
 
     # def add(self, fio, email, comment):
     #     conn = psycopg2.connect(**st.db_params)

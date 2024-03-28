@@ -6,6 +6,9 @@ import psycopg2
 from .Model import Model
 from .Dialog import Dialog
 import db
+import logging
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.DEBUG)
 
 SELECT_ONE = """select f_fio, f_email, f_comment
                 from student
@@ -19,8 +22,12 @@ class View(QTableView):
     def __init__(self, parent=None):
         super().__init__(parent)
         
+        LOG.debug('Creating Students.View')
+
         model = Model(parent=self)
         self.setModel(model)
+
+        LOG.debug('Creating Students.View: Model Installed')
 
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
@@ -31,6 +38,8 @@ class View(QTableView):
         hh = self.horizontalHeader()
         hh.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
+
+        LOG.debug("Creating Studentd.View: Finishwd")
     
     @property
     def pk(self):
