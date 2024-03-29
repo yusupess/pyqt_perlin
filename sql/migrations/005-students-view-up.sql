@@ -18,6 +18,7 @@ create view v_student as
         inner join student as st
             on au.id = st.id_user;
 
+/*-----------------------------------------------------*/
 create function new_student(p_login text, p_fio text,
                             p_email text, p_comment text) returns int
 
@@ -41,6 +42,50 @@ BEGIN
         returning id
         into strict d_pk;
     return d_pk;
+END;
+$BODY$;
+
+/*-----------------------------------------------------*/
+create function upd_student(pk int, p_fio text, p_email text,
+                            p_comment text) returns int
+language plpgsql
+security definer
+called on null input
+volatile
+as $BODY$
+DECLARE
+    d_id_user int;
+BEGIN
+    select id_user from student
+        where id = pk
+        into strict d_id_user;
+    update appuser set 
+        f_fio = p_fio,
+        f_email = p_email,
+        f_comment = p_comment
+        where id = d_id_user;
+    return pk;
+
+END;
+$BODY$;
+
+/*-------------------------------------------*/
+create function del_student(pk int ) returns int
+language plpgsql
+security definer
+called on null input
+volatile
+as $BODY$
+DECLARE
+    d_id_user int;
+BEGIN
+    select id_user from student
+        where id = pk
+        into strict d_id_user;
+    delete from appuser where id = d_id_user;
+    delete from student where id = pk;
+    return pk;
+
 END;
 $BODY$;
 
