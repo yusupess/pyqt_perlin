@@ -1,6 +1,8 @@
 START TRANSACTION;
 
-drop view if exists v_student;
+drop function if exists new_teacher(text, text, text, text, text);
+
 drop view if exists v_teacher;
+drop view if exists v_student;
 
 COMMIT TRANSACTION;
