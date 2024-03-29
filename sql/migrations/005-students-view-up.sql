@@ -18,6 +18,33 @@ create view v_student as
         inner join student as st
             on au.id = st.id_user;
 
+create function new_student(p_login text, p_fio text,
+                            p_email text, p_comment text) returns int
+
+language plpgsql
+security definer -- те же права что и владелец функции
+-- что делать если в параметры ф-ии попадаются null
+called on null input
+volatile
+as $BODY$
+DECLARE
+    d_id_user int;
+    d_pk int;
+BEGIN
+    insert into appuser(f_login, f_role, f_fio, 
+                        f_email, f_comment)
+        values (p_login, 'student', p_fio, p_email, p_comment)
+        returning id
+        into strict d_id_user;
+    insert into student(id_user)
+        values(d_id_user)
+        returning id
+        into strict d_pk;
+    return d_pk;
+END;
+$BODY$;
+
+
 /*=======================================*/
 
 create view v_teacher as

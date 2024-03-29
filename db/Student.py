@@ -2,17 +2,20 @@ from dataclasses import dataclass
 import psycopg2
 import settings as st
 
-INSERT_USER = """
-    insert into appuser(f_login, f_salt, f_role )
-    values( %s, %s, 'teacher' )
-    returning id ;
-    """
+# INSERT_USER = """
+#     insert into appuser(f_login, f_salt, f_role )
+#     values( %s, %s, 'teacher' )
+#     returning id ;
+#     """
 
-INSERT_STUDENT = """
-    insert into student ( f_fio, f_email, f_comment, id_user )
-    values( %s, %s, %s, %s)
-    returning id ;
-    """
+# INSERT_STUDENT = """
+#     insert into student ( f_fio, f_email, f_comment, id_user )
+#     values( %s, %s, %s, %s)
+#     returning id ;
+#     """
+
+# f_login, f_fio, f_email, f_comment
+INSERT_ONE = """select new_student(%s, %s, %s, %s);"""
 
 UPDATE_STUDENT = """
     update student set
@@ -41,14 +44,14 @@ class Student(object):
     comment : str = None
     id_user : int = None
 
-    @property   
-    def user_data(self):
-        return (self.login, '1')
+    # @property   
+    # def user_data(self):
+    #     return (self.login, '1')
     
     @property
     def student_data(self):
-        return ( self.fio, self.email,
-                self.comment, self.id_user)
+        return ( self.login, self.fio,
+                 self.email, self.comment)
     
     @property
     def student_upd_data(self):
@@ -60,9 +63,7 @@ class Student(object):
         conn = psycopg2.connect(**st.db_params)
         cursor = conn.cursor()
         # data = (self.fio, self.phone, self.email, self.comment, self.id_user)
-        cursor.execute(INSERT_USER, self.user_data)
-        (self.id_user, ) = next(cursor)
-        cursor.execute(INSERT_STUDENT, self.teacher_data)
+        cursor.execute(INSERT_ONE, self.student_data)
         (self.pk, ) = next(cursor)
         conn.commit()
         conn.close()
