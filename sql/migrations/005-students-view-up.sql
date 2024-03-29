@@ -64,6 +64,7 @@ create view v_teacher as
         inner join teacher as t
             on au.id = t.id_user;
 
+/*-----------------------------------------------------*/
 create function new_teacher(p_login text, p_fio text,
                             p_phone text, p_email text,
                             p_comment text) returns int
@@ -88,6 +89,55 @@ BEGIN
         returning id
         into strict d_pk;
     return d_pk;
+END;
+$BODY$;
+
+/*-----------------------------------------------------*/
+
+create function upd_teacher(pk int, p_fio text,
+                            p_phone text, p_email text,
+                            p_comment text) returns int
+language plpgsql
+security definer
+called on null input
+volatile
+as $BODY$
+DECLARE
+    d_id_user int;
+BEGIN
+    select id_user from teacher
+        where id = pk
+        into strict d_id_user;
+    update appuser set 
+        f_fio = p_fio,
+        f_email = p_email,
+        f_comment = p_comment
+        where id = d_id_user;
+    update teacher set
+        f_phone = p_phone
+        where id = pk;
+    return pk;
+
+END;
+$BODY$;
+
+/*-------------------------------------------*/
+create function del_teacher(pk int ) returns int
+language plpgsql
+security definer
+called on null input
+volatile
+as $BODY$
+DECLARE
+    d_id_user int;
+BEGIN
+    select id_user from teacher
+        where id = pk
+        into strict d_id_user;
+    delete from appuser where id = d_id_user;
+    delete from teacher where id = pk;
+    return pk;
+
 END;
 $BODY$;
 
