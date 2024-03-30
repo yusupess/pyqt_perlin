@@ -1,5 +1,10 @@
-from PyQt6.QtWidgets import QMainWindow, QMessageBox, QApplication
-from PyQt6.QtCore import pyqtSlot
+from PyQt6.QtWidgets import (QDockWidget,
+                             QMainWindow,
+                             QMessageBox,
+                             QApplication,
+                             QFrame,)
+                             
+from PyQt6.QtCore import pyqtSlot, Qt
 from MainMenu import MainMenu
 import Teachers, Students, StGroup
 from Login import LoginPassword, ChangePassword, check_password
@@ -119,6 +124,14 @@ class MainWindow(QMainWindow):
         old = self.centralWidget()
         v = StGroup.View(parent=self)
         self.setCentralWidget(v)
+        # создаем припаркованное окно
+        dock_title = QApplication.translate('MainWindow', 'Students')
+        dock_widget = QDockWidget(dock_title, parent=self)
+        docked_window = QFrame(parent=dock_widget)
+        docked_window.setStyleSheet('background: yellow')
+        dock_widget.setWidget(docked_window)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock_widget)
+
         self.menuBar().set_mode_stgroup(v)
         if old is not None:
             old.deleteLater()
