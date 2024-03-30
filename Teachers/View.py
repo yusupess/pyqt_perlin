@@ -91,5 +91,6 @@ class View(QTableView):
         # при удалении выходит окно для подтверждения
         ans = QMessageBox.question(self, 'Учитель', 'ВЫ уверены?')
         if ans == QMessageBox.StandardButton.Yes:
-            self.model().delete(id_teacher)
+            db.Teacher(pk=id_teacher).delete()
+            self.model().obnovit()
 

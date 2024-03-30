@@ -82,8 +82,8 @@ BEGIN
     select id_user from student
         where id = pk
         into strict d_id_user;
-    delete from appuser where id = d_id_user;
     delete from student where id = pk;
+    delete from appuser where id = d_id_user;
     return pk;
 
 END;
@@ -179,8 +179,8 @@ BEGIN
     select id_user from teacher
         where id = pk
         into strict d_id_user;
-    delete from appuser where id = d_id_user;
     delete from teacher where id = pk;
+    delete from appuser where id = d_id_user;
     return pk;
 
 END;

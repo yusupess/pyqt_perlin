@@ -17,22 +17,24 @@ import settings as st
 # f_login, f_fio, f_phone, f_email, f_comment
 INSERT_ONE = """select new_teacher(%s, %s, %s, %s, %s);"""
 
-UPDATE_TEACHER = """
-    update teacher set
-        f_fio = %s,
-        f_phone = %s,
-        f_email = %s,
-        f_comment = %s
-        where id = %s ;
-"""
+# UPDATE_TEACHER = """
+#     update teacher set
+#         f_fio = %s,
+#         f_phone = %s,
+#         f_email = %s,
+#         f_comment = %s
+#         where id = %s ;
+# """
 
-SELECT_ONE = """select u.f_login, t.f_fio,
-                    t.f_phone, t.f_email,
-                    t.f_comment, t.id_user
-                from appuser as u
-                inner join teacher as t
-                on u.id = t.id_user
-                where t.id = %s ;"""
+# pk, f_fio , f_phone, f_email, f_comment
+UPDATE_ONE = """select upd_teacher(%s, %s, %s, %s, %s)"""
+
+DELETE_ONE = """select del_teacher(%s)"""
+
+SELECT_ONE = """
+                select f_login, f_fio, f_phone, f_email,
+                f_comment, id_user from v_teacher
+                where pk = %s ;"""
 
 @dataclass
 class Teacher(object):
@@ -57,8 +59,8 @@ class Teacher(object):
     @property
     def teacher_upd_data(self):
         # вспомогательное свойство
-        return (self.fio, self.phone, self.email,
-                self.comment, self.pk)
+        return (self.pk, self.fio, self.phone,
+                self.email, self.comment)
 
     def insert(self):
         conn = psycopg2.connect(**st.db_params)
@@ -75,7 +77,7 @@ class Teacher(object):
         try:
             with conn:
                 with conn.cursor() as cursor:
-                    cursor.execute(UPDATE_TEACHER, self.teacher_upd_data)
+                    cursor.execute(UPDATE_ONE, self.teacher_upd_data)
         finally:
             conn.close()
     
@@ -96,6 +98,17 @@ class Teacher(object):
         conn.commit()
         conn.close()
         return self
+    
+    def delete(self):
+        conn = psycopg2.connect(**st.db_params)
+        try:
+            with conn:
+                with conn.cursor() as cursor:
+                    data = (self.pk, )
+                    cursor.execute(DELETE_ONE, data)
+        finally:
+            conn.close()
+
 
 
     

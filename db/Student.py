@@ -16,22 +16,14 @@ import settings as st
 
 # f_login, f_fio, f_email, f_comment
 INSERT_ONE = """select new_student(%s, %s, %s, %s);"""
+# pk, f_fio ,f_email, f_comment
+UPDATE_ONE = """select upd_student(%s, %s, %s, %s)"""
+DELETE_ONE = """select del_student(%s)"""
 
-UPDATE_STUDENT = """
-    update student set
-        f_fio = %s,
-        f_email = %s,
-        f_comment = %s
-        where id = %s ;
-"""
-
-SELECT_ONE = """select u.f_login, t.f_fio,
-                    t.f_email,
-                    t.f_comment, t.id_user
-                from appuser as u
-                inner join student as t
-                on u.id = t.id_user
-                where t.id = %s ;"""
+SELECT_ONE = """
+                select f_login, f_fio, f_email,
+                f_comment, id_user from v_student
+                where pk = %s ;"""
 
 
 @dataclass
@@ -56,8 +48,8 @@ class Student(object):
     @property
     def student_upd_data(self):
         # вспомогательное свойство
-        return (self.fio, self.email,
-                self.comment, self.pk)
+        return (self.pk, self.fio, self.email,
+                self.comment)
 
     def insert(self):
         conn = psycopg2.connect(**st.db_params)
@@ -74,7 +66,7 @@ class Student(object):
         try:
             with conn:
                 with conn.cursor() as cursor:
-                    cursor.execute(UPDATE_STUDENT, self.student_upd_data)
+                    cursor.execute(UPDATE_ONE, self.student_upd_data)
         finally:
             conn.close()
 
@@ -96,3 +88,13 @@ class Student(object):
         conn.commit()
         conn.close()
         return self
+    
+    def delete(self):
+        conn = psycopg2.connect(**st.db_params)
+        try:
+            with conn:
+                with conn.cursor() as cursor:
+                    data = (self.pk, )
+                    cursor.execute(DELETE_ONE, data)
+        finally:
+            conn.close()
