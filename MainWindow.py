@@ -42,6 +42,10 @@ class MainWindow(QMainWindow):
 
         if not self.authorize():
             main_menu.lock()
+    
+    @property
+    def all_docks(self):
+        return [x for x in self.children() if isinstance(x, QDockWidget)]
 
     def authorize(self):
         dia = LoginPassword(self)
@@ -112,29 +116,40 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def student_mode_on(self):
-        old = self.centralWidget()
-        v = Students.View(parent=self)
-        self.setCentralWidget(v)
-        self.menuBar().set_mode_student(v)
-        if old is not None:
-            old.deleteLater()
+        if self.mode_off(Students.View):
+            old = self.centralWidget()
+            v = Students.View(parent=self)
+            self.setCentralWidget(v)
+            self.menuBar().set_mode_student(v)
 
     @pyqtSlot()
     def stgroup_mode_on(self):
-        old = self.centralWidget()
-        v = StGroup.View(parent=self)
-        self.setCentralWidget(v)
-        # создаем припаркованное окно
-        dock_title = QApplication.translate('MainWindow', 'Students')
-        dock_widget = QDockWidget(dock_title, parent=self)
-        docked_window = QFrame(parent=dock_widget)
-        docked_window.setStyleSheet('background: yellow')
-        dock_widget.setWidget(docked_window)
-        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock_widget)
+        if self.mode_off(StGroup.View):
+            old = self.centralWidget()
+            v = StGroup.View(parent=self)
+            self.setCentralWidget(v)
+            # создаем припаркованное окно
+            dock_title = QApplication.translate('MainWindow', 'Students')
+            dock_widget = QDockWidget(dock_title, parent=self)
+            docked_window = QFrame(parent=dock_widget)
+            docked_window.setStyleSheet('background: yellow')
+            dock_widget.setWidget(docked_window)
+            self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock_widget)
 
-        self.menuBar().set_mode_stgroup(v)
-        if old is not None:
-            old.deleteLater()
+            self.menuBar().set_mode_stgroup(v)
+
+    # если  atype указан -> то old имеет тип atype
+    def mode_off(self, atype=None):
+        old = self.centralWidget()
+        if old is None:
+            return True
+        if atype is not None and isinstance(old, atype):
+            return False
+        self.setCentralWidget(None)
+        old.deleteLater()
+        for d in self.all_docks:
+            d.deleteLater()
+        return True
     
     
 
