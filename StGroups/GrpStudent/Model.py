@@ -1,4 +1,4 @@
-from PyQt6.QtCore import Qt, QAbstractTableModel, QModelIndex
+from PyQt6.QtCore import Qt, QAbstractTableModel, pyqtSlot
 import psycopg2
 import settings as st
 import db
@@ -10,7 +10,7 @@ SELECT_ALL = """select st.pk,
                 from student_group as sg 
                 inner join v_student as st
                 on st.pk = sg.id_student
-                where id_group = 1;
+                where id_group = %s;
              """
 
 
@@ -20,7 +20,7 @@ class Model(QAbstractTableModel):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.__students = []
-        self.refill(id_group=1)
+        self.refill(id_group=None)
 
     def rowCount(self, parent_index) -> int:
         if parent_index.isValid():
@@ -42,9 +42,11 @@ class Model(QAbstractTableModel):
                 return f'{r=}, {c=}'
         else:
             return None
-        
+    
+    @pyqtSlot(int)
     def refill(self, id_group=None):
         self.beginResetModel()
+        print(f'фкнкция рефидд')
         try:
             self.__students = []
             if id_group is None:

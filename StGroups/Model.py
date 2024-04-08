@@ -1,3 +1,4 @@
+from PyQt6.QtCore import QModelIndex, Qt
 from PyQt6.QtSql import QSqlQueryModel
 import settings as st
 import psycopg2
@@ -60,3 +61,13 @@ class Model(QSqlQueryModel):
         conn.commit()
         conn.close()
         self.obnovit()
+
+    def data(self, index: QModelIndex, role):
+        # отвеяает за предоставление даты модели
+
+        # если роль зарезервирована то менять мы ничего не будем
+        if role != Qt.ItemDataRole.UserRole + 0:
+            return super().data(index, role)
+        r = index.row()
+        rec = self.record(r)
+        return rec.value(0)

@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QTableView, QMessageBox, QDialog, QAbstractItemView,
 from PyQt6.QtWidgets import QLabel, QLineEdit, QTextEdit, QPushButton
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt6.QtSql import QSqlQueryModel
-from PyQt6.QtCore import pyqtSlot
+from PyQt6.QtCore import QModelIndex, pyqtSlot, Qt, pyqtSignal
 from .Model import Model
 from .Dialog import Dialog
 import settings as st
@@ -17,6 +17,8 @@ SELECT_ONE = """select f_title, f_comment
 
 
 class View(QTableView):
+    
+    group_selected = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -69,4 +71,13 @@ class View(QTableView):
         ans = QMessageBox.question(self, 'Группа', 'ВЫ уверены?')
         if ans == QMessageBox.StandardButton.Yes:
             self.model().delete(id_stgroup)
+
+    def currentChanged(self, curr, prev):
+        # return super().currentChanged(curr, prev)()
+        if curr.isValid():
+            id_group = curr.data(Qt.ItemDataRole.UserRole+0 )
+        else:
+            id_group = None
+        self.group_selected.emit(id_group)
+        print(id_group)
 

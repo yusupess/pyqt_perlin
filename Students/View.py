@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QTableView, QMessageBox, QAbstractItemView, QHeaderView
-from PyQt6.QtCore import pyqtSlot
+from PyQt6.QtCore import pyqtSlot, pyqtSignal, Qt
 import settings as st
 import psycopg2
 
@@ -18,6 +18,8 @@ SELECT_ONE = """select f_fio, f_email, f_comment
 
 
 class View(QTableView):
+
+    student_selected = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -95,5 +97,14 @@ class View(QTableView):
         if ans == QMessageBox.StandardButton.Yes:
             db.Student(pk=id_student).delete()
             self.model().obnovit()
+
+    def currentChanged(self, curr, prev):
+        # return super().currentChanged(curr, prev)()
+        if curr.isValid():
+            id_student = curr.data(Qt.ItemDataRole.UserRole+0 )
+        else:
+            id_student = None
+        self.student_selected.emit(id_student)
+        print(id_student)
 
 

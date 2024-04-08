@@ -1,5 +1,5 @@
 from PyQt6.QtSql import QSqlQueryModel
-from PyQt6.QtCore import pyqtSlot
+from PyQt6.QtCore import pyqtSlot, Qt
 import settings as st
 import psycopg2
 
@@ -72,3 +72,10 @@ class Model(QSqlQueryModel):
         conn.commit()
         conn.close()
         self.obnovit()
+
+    def data(self, index, role):
+        if role != Qt.ItemDataRole.UserRole+0:
+            return super().data(index, role)
+        r = index.row()
+        rec = self.record(r)
+        return rec.value(0)

@@ -10,7 +10,7 @@ class View(QTableView):
 
         model = Model(parent=self)
         self.setModel(model)
-    
+
     @pyqtSlot(int)
-    def select_group(self, id_group=None):
-        self.model().refill(id_group)
+    def select_student(self, id_student=None):
+        self.model().refill(id_student)

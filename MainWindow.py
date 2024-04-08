@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (QDockWidget,
                              
 from PyQt6.QtCore import pyqtSlot, Qt
 from MainMenu import MainMenu
+import Students.StdGroup
 import Teachers, Students, StGroups
 from Login import LoginPassword, ChangePassword, check_password
 from Login import password_hash
@@ -117,17 +118,19 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def student_mode_on(self):
         if self.mode_off(Students.View):
-            old = self.centralWidget()
+            # old = self.centralWidget()
             v = Students.View(parent=self)
             self.setCentralWidget(v)
             # создаем припаркованное окно
             dock_title = QApplication.translate('MainWindow', 'Groups')
             dock_widget = QDockWidget(dock_title, parent=self)
-            docked_window = QFrame(parent=dock_widget)
-            docked_window.setStyleSheet('background: green')
+            
+            docked_window = Students.StdGroup.View(parent=dock_widget)
+
             dock_widget.setWidget(docked_window)
             self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock_widget)
             
+            v.student_selected.connect(docked_window.select_student)
             self.menuBar().set_mode_student(v, [dock_widget])
 
     @pyqtSlot()
@@ -139,14 +142,13 @@ class MainWindow(QMainWindow):
             dock_title = QApplication.translate('MainWindow', 'Students')
             dock_widget = QDockWidget(dock_title, parent=self)
             
-            # docked_window = QFrame(parent=dock_widget)
             docked_window = StGroups.GrpStudent.View(parent=dock_widget)
             
             dock_widget.setWidget(docked_window)
             self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock_widget)
-
+            
+            v.group_selected.connect(docked_window.select_group)
             self.menuBar().set_mode_stgroup(v, [dock_widget])
-            print('stgroup_mode_on')
 
     # если  atype указан -> то old имеет тип atype
     def mode_off(self, atype=None):
