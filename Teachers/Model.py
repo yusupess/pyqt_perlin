@@ -2,11 +2,17 @@ from PyQt6.QtWidgets import QTableView, QMessageBox, QDialog, QAbstractItemView,
 from PyQt6.QtWidgets import QLabel, QLineEdit, QTextEdit, QPushButton
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt6.QtSql import QSqlQueryModel
+from exceptions import MyQtSqlModelError
 import settings as st
 import psycopg2
 
-SELECT_ALL = """select id, f_fio, f_phone, f_email,
-                 f_comment from teacher;"""
+import logging
+
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.DEBUG)
+
+SELECT_ALL = """select pk, f_fio, f_phone, f_email,
+                 f_comment from v_teacher;"""
 
 # команда для вставки новой строчки в базу данных
 # INSERT = """insert into teacher ( f_fio, f_phone, f_email, f_comment )
@@ -39,6 +45,13 @@ class Model(QSqlQueryModel):
 
     def obnovit(self):
         self.setQuery(SELECT_ALL)
+        if self.lastError().isValid():
+            err_text = self.lastError().text()
+            LOG.error(err_text)
+            raise MyQtSqlModelError(err_text)
+        else:
+            LOG.info("Teacher query OK")
+
 
     # def add(self, fio, phone, email, comment):
     #     conn = psycopg2.connect(host=st.db_params['host'],

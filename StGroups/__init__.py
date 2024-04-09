@@ -2,4 +2,4 @@ from .Model import Model
 from .Dialog import Dialog
 from .View import View
 
-from . import StdGroup
+from . import GrpStudent

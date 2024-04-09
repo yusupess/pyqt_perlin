@@ -128,11 +128,13 @@ class Dialog(QDialog):
         data.email = self.email
         data.comment = self.comment
     
-    def put(self, data):
+    def put(self, data, *, for_update=False):
         self.login = data.login
         self.fio = data.fio
         self.phone = data.phone
         self.email = data.email
         self.comment = data.comment
+        # редактирование логина недоступно
+        self.__frame.ui.login_edt.setReadOnly(for_update)
         
 

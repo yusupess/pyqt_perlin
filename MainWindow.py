@@ -1,7 +1,13 @@
-from PyQt6.QtWidgets import QMainWindow, QMessageBox, QApplication
-from PyQt6.QtCore import pyqtSlot
+from PyQt6.QtWidgets import (QDockWidget,
+                             QMainWindow,
+                             QMessageBox,
+                             QApplication,
+                             QFrame,)
+                             
+from PyQt6.QtCore import pyqtSlot, Qt
 from MainMenu import MainMenu
-import Teachers, Students, StGroup
+import Students.StdGroup
+import Teachers, Students, StGroups
 from Login import LoginPassword, ChangePassword, check_password
 from Login import password_hash
 import psycopg2
@@ -37,6 +43,10 @@ class MainWindow(QMainWindow):
 
         if not self.authorize():
             main_menu.lock()
+    
+    @property
+    def all_docks(self):
+        return [x for x in self.children() if isinstance(x, QDockWidget)]
 
     def authorize(self):
         dia = LoginPassword(self)
@@ -107,21 +117,51 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def student_mode_on(self):
-        old = self.centralWidget()
-        v = Students.View(parent=self)
-        self.setCentralWidget(v)
-        self.menuBar().set_mode_student(v)
-        if old is not None:
-            old.deleteLater()
+        if self.mode_off(Students.View):
+            # old = self.centralWidget()
+            v = Students.View(parent=self)
+            self.setCentralWidget(v)
+            # создаем припаркованное окно
+            dock_title = QApplication.translate('MainWindow', 'Groups')
+            dock_widget = QDockWidget(dock_title, parent=self)
+            
+            docked_window = Students.StdGroup.View(parent=dock_widget)
+
+            dock_widget.setWidget(docked_window)
+            self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock_widget)
+            
+            v.student_selected.connect(docked_window.select_student)
+            self.menuBar().set_mode_student(v, [dock_widget])
 
     @pyqtSlot()
     def stgroup_mode_on(self):
+        if self.mode_off(StGroups.View):
+            v = StGroups.View(parent=self)
+            self.setCentralWidget(v)
+            # создаем припаркованное окно
+            dock_title = QApplication.translate('MainWindow', 'Students')
+            dock_widget = QDockWidget(dock_title, parent=self)
+            
+            docked_window = StGroups.GrpStudent.View(parent=dock_widget)
+            
+            dock_widget.setWidget(docked_window)
+            self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock_widget)
+            
+            v.group_selected.connect(docked_window.select_group)
+            self.menuBar().set_mode_stgroup(v, [dock_widget])
+
+    # если  atype указан -> то old имеет тип atype
+    def mode_off(self, atype=None):
         old = self.centralWidget()
-        v = StGroup.View(parent=self)
-        self.setCentralWidget(v)
-        self.menuBar().set_mode_stgroup(v)
-        if old is not None:
-            old.deleteLater()
+        if old is None:
+            return True
+        if atype is not None and isinstance(old, atype):
+            return False
+        self.setCentralWidget(None)
+        old.deleteLater()
+        for d in self.all_docks:
+            d.deleteLater()
+        return True
     
     
 

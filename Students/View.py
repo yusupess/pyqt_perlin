@@ -1,10 +1,14 @@
 from PyQt6.QtWidgets import QTableView, QMessageBox, QAbstractItemView, QHeaderView
-from PyQt6.QtCore import pyqtSlot
+from PyQt6.QtCore import pyqtSlot, pyqtSignal, Qt
 import settings as st
 import psycopg2
 
 from .Model import Model
 from .Dialog import Dialog
+import db
+import logging
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.DEBUG)
 
 SELECT_ONE = """select f_fio, f_email, f_comment
                 from student
@@ -15,11 +19,17 @@ SELECT_ONE = """select f_fio, f_email, f_comment
 
 class View(QTableView):
 
+    student_selected = pyqtSignal(int)
+
     def __init__(self, parent=None):
         super().__init__(parent)
         
+        LOG.debug('Creating Students.View')
+
         model = Model(parent=self)
         self.setModel(model)
+
+        LOG.debug('Creating Students.View: Model Installed')
 
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
@@ -31,33 +41,52 @@ class View(QTableView):
         hh.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
 
+        LOG.debug("Creating Studentd.View: Finishwd")
+    
+    @property
+    def pk(self):
+        row = self.currentIndex().row()
+        return self.model().record(row).value(0)
+
     @pyqtSlot()
     def add(self):
         # QMessageBox.information(self, 'Учитель', 'Добавление')
         dia = Dialog(parent=self)
         if dia.exec():
-            self.model().add(dia.fio, dia.email, dia.comment)
+            data = db.Student()
+            dia.get(data)
+            data.save()
+            self.model().obnovit()
 
 
     @pyqtSlot()
     def update(self):
+        # dia = Dialog(parent=self)
+        # row = self.currentIndex().row()
+        # id_student = self.model().record(row).value(0)
+        # # подключаемся к базе данных
+        # conn = psycopg2.connect(**st.db_params)
+        # # создаем курсор
+        # cursor = conn.cursor()
+        # data = (id_student,)
+        # cursor.execute(SELECT_ONE, data)
+        # # считываем строку из базы даных и записываем в строки диалогового окна
+        # dia.fio, dia.email, dia.comment = cursor.fetchone()
+        # # после счиьываения обязательно закываем подключение к базе
+        # conn.close()
+        # if dia.exec():
+        #     self.model().update(id_student, dia.fio,
+        #                         dia.email, dia.comment
+        #                         )
         dia = Dialog(parent=self)
-        row = self.currentIndex().row()
-        id_student = self.model().record(row).value(0)
-        # подключаемся к базе данных
-        conn = psycopg2.connect(**st.db_params)
-        # создаем курсор
-        cursor = conn.cursor()
-        data = (id_student,)
-        cursor.execute(SELECT_ONE, data)
-        # считываем строку из базы даных и записываем в строки диалогового окна
-        dia.fio, dia.email, dia.comment = cursor.fetchone()
-        # после счиьываения обязательно закываем подключение к базе
-        conn.close()
+        data = db.Student(pk = self.pk).load()
+        dia.put(data, for_update=True)
         if dia.exec():
-            self.model().update(id_student, dia.fio,
-                                dia.email, dia.comment
-                                )
+            dia.get(data)
+            data.save()
+            self.model().obnovit()
+
+
 
     @pyqtSlot()
     def delete(self):
@@ -66,4 +95,16 @@ class View(QTableView):
         # при удалении выходит окно для подтверждения
         ans = QMessageBox.question(self, 'Ученик', 'ВЫ уверены?')
         if ans == QMessageBox.StandardButton.Yes:
-            self.model().delete(id_student)
+            db.Student(pk=id_student).delete()
+            self.model().obnovit()
+
+    def currentChanged(self, curr, prev):
+        # return super().currentChanged(curr, prev)()
+        if curr.isValid():
+            id_student = curr.data(Qt.ItemDataRole.UserRole+0 )
+        else:
+            id_student = None
+        self.student_selected.emit(id_student)
+        print(id_student)
+
+

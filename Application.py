@@ -2,7 +2,11 @@ import sys
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtSql import QSqlDatabase  # главный класс подключения к базам данных
 import settings as st
-
+# логгинг отевчает за журналирование
+# добавляем это для мониторинга ошибок которые не описываются
+import logging
+LOG = logging.getLogger(__name__)
+# LOG.setLevel(logging.DEBUG)
 
 class Application(QApplication):
 
@@ -20,9 +24,9 @@ class Application(QApplication):
         db.setPassword(st.db_params['password'])
         ok = db.open()
         if ok:
-            print('Connected to database', file=sys.stderr)
+            LOG.info(f'Connected to database{st.db_params["dbname"]}')
         else:
-            print('Connection FAILED', file=sys.stderr)
+            LOG.error('Connection FAILED')
 
     @property
     def login(self):

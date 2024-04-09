@@ -1,7 +1,16 @@
 from PyQt6.QtSql import QSqlQueryModel
-from PyQt6.QtCore import pyqtSlot
+from PyQt6.QtCore import pyqtSlot, Qt
 import settings as st
 import psycopg2
+
+from exceptions import MyQtSqlModelError
+import logging
+# __name__ это имя текущего модуля
+# далее когда ошибка появится - ERROR:Students.Model:ERROR:  column "f_fio" does not exist
+# Students.Model  - эта запись как раз таки изза указанного __name__, 
+# а иначе ошибка бы выглядeла - ERROR:root:ERROR:  column "f_fio" does not exist
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.DEBUG)
 
 
 INSERT = """insert into student ( f_fio, f_email, f_comment )
@@ -27,18 +36,24 @@ class Model(QSqlQueryModel):
         self.obnovit()
 
     def obnovit(self):
-        sql = """select id, f_fio, f_email,
-                 f_comment from student;"""
+        sql = """select pk, f_fio, f_email,
+                 f_comment from v_student;"""
         self.setQuery(sql)
+        if self.lastError().isValid():
+            err_text = self.lastError().text()
+            LOG.error(err_text)
+            raise MyQtSqlModelError(err_text)
+        else:
+            LOG.info("Student query OK")
 
-    def add(self, fio, email, comment):
-        conn = psycopg2.connect(**st.db_params)
-        cursor = conn.cursor()
-        data = (fio, email, comment)
-        cursor.execute(INSERT, data)
-        conn.commit()
-        conn.close()
-        self.obnovit()
+    # def add(self, fio, email, comment):
+    #     conn = psycopg2.connect(**st.db_params)
+    #     cursor = conn.cursor()
+    #     data = (fio, email, comment)
+    #     cursor.execute(INSERT, data)
+    #     conn.commit()
+    #     conn.close()
+    #     self.obnovit()
 
     def update(self, id_student, fio, email, comment):
         conn = psycopg2.connect(**st.db_params)
@@ -57,3 +72,10 @@ class Model(QSqlQueryModel):
         conn.commit()
         conn.close()
         self.obnovit()
+
+    def data(self, index, role):
+        if role != Qt.ItemDataRole.UserRole+0:
+            return super().data(index, role)
+        r = index.row()
+        rec = self.record(r)
+        return rec.value(0)
