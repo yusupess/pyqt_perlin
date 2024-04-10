@@ -19,5 +19,8 @@ class View(QTableView):
     
     @pyqtSlot()
     def add_old_student(self):
-        dia = DialogOld(parent=self)
+        id_group = self.model().id_group
+        if id_group is None:
+            return
+        dia = DialogOld(id_group, parent=self)
         dia.exec()

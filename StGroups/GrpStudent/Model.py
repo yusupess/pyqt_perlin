@@ -21,6 +21,11 @@ class Model(QAbstractTableModel):
         super().__init__(parent)
         self.__students = []
         self.refill(id_group=None)
+        self.__id_group = None
+
+    @property
+    def id_group(self):
+        return self.__id_group
 
     def rowCount(self, parent_index) -> int:
         if parent_index.isValid():
@@ -46,7 +51,7 @@ class Model(QAbstractTableModel):
     @pyqtSlot(int)
     def refill(self, id_group=None):
         self.beginResetModel()
-        print(f'фкнкция рефидд')
+        self.__id_group = id_group
         try:
             self.__students = []
             if id_group is None:
