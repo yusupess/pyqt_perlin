@@ -2,7 +2,10 @@ from PyQt6.QtCore import QModelIndex, Qt
 from PyQt6.QtSql import QSqlQueryModel
 import settings as st
 import psycopg2
+import logging
 
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.DEBUG)
 
 INSERT = """insert into stgroup ( f_title, f_comment )
          values ( %s, %s ) ;         

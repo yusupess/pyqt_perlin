@@ -1,8 +1,5 @@
-from PyQt6.QtWidgets import QTableView, QMessageBox, QDialog, QAbstractItemView, QHeaderView
-from PyQt6.QtWidgets import QLabel, QLineEdit, QTextEdit, QPushButton
-from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
-from PyQt6.QtSql import QSqlQueryModel
-from PyQt6.QtCore import QModelIndex, pyqtSlot, Qt, pyqtSignal
+from PyQt6.QtWidgets import QTableView, QMessageBox, QAbstractItemView, QHeaderView
+from PyQt6.QtCore import pyqtSlot, Qt, pyqtSignal
 from .Model import Model
 from .Dialog import Dialog
 import settings as st
@@ -79,5 +76,5 @@ class View(QTableView):
         else:
             id_group = None
         self.group_selected.emit(id_group)
-        print(id_group)
+        # print(id_group)
 

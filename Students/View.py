@@ -105,6 +105,5 @@ class View(QTableView):
         else:
             id_student = None
         self.student_selected.emit(id_student)
-        print(id_student)
 
 

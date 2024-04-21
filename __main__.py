@@ -4,7 +4,7 @@ from MainWindow import MainWindow
 
 import logging
 
-logging.basicConfig(encoding='utf-8', level=logging.WARNING)
+logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 
 app = Application(sys.argv) # создаем обьект приложения
 
