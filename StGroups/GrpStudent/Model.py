@@ -69,5 +69,13 @@ class Model(QAbstractTableModel):
                 conn.close()
         finally:
             self.endResetModel()
-        
+
+    def add_students(self, new_students):
+        self.beginResetModel()
+        try:
+            for id_student, fname in new_students:
+                data = db.Student(pk=id_student, fio=fname)
+                self.__students.insert(0, data)
+        finally:
+            self.endResetModel()
         

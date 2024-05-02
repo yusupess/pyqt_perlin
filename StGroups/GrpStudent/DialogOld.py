@@ -36,12 +36,16 @@ class _Model(QSqlQueryModel):
         self.qry.bindValue(':IDGROUP', id_group)
         self.qry.exec()
 
-        self.__selected_ids = set()
+        self.__selected = dict()
         self.setQuery(self.qry)
 
     @property
     def selected_ids(self):
-        return self.__selected_ids
+        return list(self.__selected.keys())
+    
+    @property
+    def selected(self):
+        return list(self.__selected.items())
 
     def flags(self, index):
         """чтоб сделать возможным наличие флагов,
@@ -62,7 +66,7 @@ class _Model(QSqlQueryModel):
                 a = Qt.ItemDataRole.UserRole+0
                 id = index.data(a)
                 # print(f'id  -- {id}')
-                if id in self.__selected_ids:
+                if id in self.__selected:
                     return Qt.CheckState.Checked
                 else:
                     return Qt.CheckState.Unchecked
@@ -79,9 +83,10 @@ class _Model(QSqlQueryModel):
         self.beginResetModel()
         try:
             if value == 0: # тут должно быть if value == Qt.CheckState.Unchecked
-                self.__selected_ids.remove(id_student)
+                del self.__selected[id_student]
             else:
-                self.__selected_ids.add(id_student)
+                fname = index.data(Qt.ItemDataRole.DisplayRole)
+                self.__selected[id_student] = fname
         finally:
             self.endResetModel()
         return True
@@ -140,5 +145,5 @@ class DialogOld(QDialog):
         btn.rejected.connect(self.reject)
 
     @property
-    def selected_ids(self):
-        return self.__view.model().selected_ids
+    def selected(self):
+        return self.__view.model().selected

@@ -24,4 +24,5 @@ class View(QTableView):
             return
         dia = DialogOld(id_group, parent=self)
         if dia.exec():
-            print(dia.selected_ids)
+            print(dia.selected)
+            self.model().add_students(dia.selected)
