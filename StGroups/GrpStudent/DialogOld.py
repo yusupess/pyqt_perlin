@@ -13,7 +13,7 @@ import logging
 
 
 LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.ERROR)
+# LOG.setLevel(logging.DEBUG)
 
 _SELECT = '''
 select st.pk, st.f_fio 
@@ -29,22 +29,14 @@ class _Model(QSqlQueryModel):
 
     def __init__(self, id_group, parent=None):
         super().__init__(parent)
+        LOG.debug('Creating DialogOld.Model')
+        self.qry = QSqlQuery()
+        self.qry.prepare(_SELECT)
+        self.qry.bindValue(':IDGROUP', id_group)
+        self.qry.exec()
         
-        qry = QSqlQuery()
-        qry.prepare(_SELECT)
-        # if qry.lastError().isValid():
-        #     err_text = self.lastError().text()
-        #     LOG.error(err_text)
-        #     raise MyQtSqlModelError(err_text)
-        qry.bindValue(':IDGROUP', id_group)
-        qry.exec()
-        # if qry.lastError().isValid():
-        #     err_text = self.lastError().text()
-        #     LOG.error(err_text)
-        #     raise MyQtSqlModelError(err_text)
-
         self.__selected_ids = set()
-        self.setQuery(qry)
+        self.setQuery(self.qry)
 
     
     def flags(self, index):
@@ -54,34 +46,19 @@ class _Model(QSqlQueryModel):
         if index.column() == 1:
             fl |= Qt.ItemFlag.ItemIsUserCheckable
         return fl
-    
+
     def data(self, index: QModelIndex, role):
-        
         """Чтоб было видно флаги"""
-        # print(f'index - {index}')
-        # print(f"role - {role}")
-        # print(f'Qt.ItemDataRole.UserRole - {Qt.ItemDataRole.UserRole}')
-        # print(f'Qt.ItemDataRole.DisplayRole - {Qt.ItemDataRole.DisplayRole}')
-        # print(f'Qt.ItemDataRole.CheckStateRole - {Qt.ItemDataRole.CheckStateRole}')
-        # print(index.row(), index.column())
-        # print(dir(index))
-        # print(f"index.parent()  - {index.parent()}")
-        # id = index.data(Qt.ItemDataRole.UserRole+0)
-        # print(f'id  -- {id}')
         if role == (Qt.ItemDataRole.UserRole + 0):
-            print(role)
-            print('pk')
             try:
-                print('pk2')
-                return self.query().value('pk')
+                return self.qry.value('pk')
             except BaseException as err:
                 print(err)
                 print(type(err))
         elif role == Qt.ItemDataRole.CheckStateRole:
-            if index.column() ==0: #!= 1:
+            if index.column() != 1:
                 return super().data(index, role)
             else:
-                print('1')
                 a = Qt.ItemDataRole.UserRole+0
                 print(f'a  - {a}')
                 id = index.data(a)
@@ -92,12 +69,6 @@ class _Model(QSqlQueryModel):
                     return Qt.CheckState.Unchecked
         else:
             return super().data(index, role)
-        # if self.lastError().isValid():
-        #     err_text = self.lastError().text()
-        #     LOG.error(err_text)
-        #     raise MyQtSqlModelError(err_text)
-        # else:
-        #     LOG.info("Student query OK")
 
 
 class _View(QTableView):
@@ -105,9 +76,11 @@ class _View(QTableView):
     клааа не используем."""
     def __init__(self, id_group, parent=None):
         try:
+            LOG.debug('Creating DialogOld.View')
             super().__init__(parent)
 
             self.setModel(_Model(id_group, parent=self))
+            LOG.debug("Creating DialogOld.View: Finishwd")
 
            # self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
            # self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
@@ -130,6 +103,7 @@ class _View(QTableView):
 class DialogOld(QDialog):
 
     def __init__(self, id_group, parent=None):
+        LOG.debug('Creating DialogOld.Qdialog')
         
         super().__init__(parent)
 
