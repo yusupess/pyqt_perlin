@@ -3,6 +3,7 @@
    не входят в опрежедленную группу.
 """
 
+from typing import Dict
 from PyQt6.QtWidgets import QDialog, QTableView, QDialogButtonBox, QHeaderView
 from PyQt6.QtSql import QSqlQueryModel, QSqlQuery
 from PyQt6.QtCore import Qt, QModelIndex
@@ -34,11 +35,14 @@ class _Model(QSqlQueryModel):
         self.qry.prepare(_SELECT)
         self.qry.bindValue(':IDGROUP', id_group)
         self.qry.exec()
-        
+
         self.__selected_ids = set()
         self.setQuery(self.qry)
 
-    
+    @property
+    def selected_ids(self):
+        return self.__selected_ids
+
     def flags(self, index):
         """чтоб сделать возможным наличие флагов,
         но флагов после этого еще не будет видно"""
@@ -50,25 +54,37 @@ class _Model(QSqlQueryModel):
     def data(self, index: QModelIndex, role):
         """Чтоб было видно флаги"""
         if role == (Qt.ItemDataRole.UserRole + 0):
-            try:
-                return self.qry.value('pk')
-            except BaseException as err:
-                print(err)
-                print(type(err))
+            return self.qry.value('pk')
         elif role == Qt.ItemDataRole.CheckStateRole:
             if index.column() != 1:
                 return super().data(index, role)
             else:
                 a = Qt.ItemDataRole.UserRole+0
-                print(f'a  - {a}')
                 id = index.data(a)
-                print(f'id  -- {id}')
+                # print(f'id  -- {id}')
                 if id in self.__selected_ids:
                     return Qt.CheckState.Checked
                 else:
                     return Qt.CheckState.Unchecked
         else:
             return super().data(index, role)
+
+    def setData(self, index, value, role) -> bool:
+        print(value)
+        
+        """фуекция делает возможным устанавливать галочки"""
+        if role != Qt.ItemDataRole.CheckStateRole or index.column() != 1:
+            return super().setData(index, value, role)
+        id_student = index.data(Qt.ItemDataRole.UserRole + 0)
+        self.beginResetModel()
+        try:
+            if value == 0: # тут должно быть if value == Qt.CheckState.Unchecked
+                self.__selected_ids.remove(id_student)
+            else:
+                self.__selected_ids.add(id_student)
+        finally:
+            self.endResetModel()
+        return True
 
 
 class _View(QTableView):
@@ -113,7 +129,7 @@ class DialogOld(QDialog):
 
         lay = QVBoxLayout(self)
 
-        view = _View(id_group, parent=self)
+        self.__view = view = _View(id_group, parent=self)
         lay.addWidget(view)
         btn = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok
                                | QDialogButtonBox.StandardButton.Cancel,
@@ -122,3 +138,7 @@ class DialogOld(QDialog):
         
         btn.accepted.connect(self.accept)
         btn.rejected.connect(self.reject)
+
+    @property
+    def selected_ids(self):
+        return self.__view.model().selected_ids

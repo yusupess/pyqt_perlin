@@ -16,11 +16,12 @@ class View(QTableView):
     @pyqtSlot(int)
     def select_group(self, id_group=None):
         self.model().refill(id_group)
-    
+
     @pyqtSlot()
     def add_old_student(self):
         id_group = self.model().id_group
         if id_group is None:
             return
         dia = DialogOld(id_group, parent=self)
-        dia.exec()
+        if dia.exec():
+            print(dia.selected_ids)
