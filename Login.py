@@ -1,7 +1,7 @@
 """Здесь описано окно для ввода логина и пароля."""
 from PyQt6.QtWidgets import QDialog, QLabel, QPushButton, QLineEdit
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
-from PyQt6.QtCore import pyqtSlot
+from PyQt6.QtCore import pyqtSlot, QCoreApplication
 import settings as st
 from hashlib import sha1
 
@@ -15,7 +15,9 @@ class LoginPassword(QDialog):
 
         lay_login = QVBoxLayout()
         lay_login.setSpacing(0)
-        login_tit = QLabel('Логин', parent=self)
+
+        title = QCoreApplication.translate('Login', 'Login')
+        login_tit = QLabel(title, parent=self)
         self.__login_edt = QLineEdit(parent=self)
         lay_login.addWidget(login_tit)
         lay_login.addWidget(self.__login_edt)
@@ -23,7 +25,8 @@ class LoginPassword(QDialog):
 
         lay_pwd = QVBoxLayout()
         lay_pwd.setSpacing(0)
-        password_tit = QLabel('Пароль', parent=self)
+        title = QCoreApplication.translate('Login', 'Password')
+        password_tit = QLabel(title, parent=self)
         self.__password_edt = QLineEdit(parent=self)
         # для то го чтобы пароль при вводе отображался звездочками
         # PyQt5:  self.__password_edt.setEchoMode(QLineEdit.Password)
@@ -34,8 +37,10 @@ class LoginPassword(QDialog):
 
         lay_btn = QHBoxLayout()
         lay_btn.addStretch()
-        ok = QPushButton('OK', parent=self)
-        cancel = QPushButton('Отмена', parent=self)
+        title = QCoreApplication.translate('Login', 'OK')
+        ok = QPushButton(title, parent=self)
+        title = QCoreApplication.translate('Login', 'Cancel')
+        cancel = QPushButton(title, parent=self)
         lay_btn.addWidget(ok)
         lay_btn.addWidget(cancel)
         
@@ -64,7 +69,8 @@ class ChangePassword(QDialog):
 
         lay_first = QVBoxLayout()
         lay_first.setSpacing(0)
-        lay_first.addWidget(QLabel('Введите новый пароль', parent=self))
+        title = QCoreApplication.translate('Login.ChangePassword', 'Login')
+        lay_first.addWidget(QLabel(title, parent=self))
         self.__password_edt = QLineEdit(parent=self)
         self.__password_edt.setEchoMode(QLineEdit.EchoMode.Password)
         lay_first.addWidget(self.__password_edt)
@@ -72,7 +78,8 @@ class ChangePassword(QDialog):
 
         lay_second = QVBoxLayout()
         lay_second.setSpacing(0)
-        lay_second.addWidget(QLabel('Повторите новый пароль', parent=self))
+        title = QCoreApplication.translate('Login.ChangePassword', 'Password again')
+        lay_second.addWidget(QLabel(title, parent=self))
         self.__repeat_edt = QLineEdit(parent=self)
         self.__repeat_edt.setEchoMode(QLineEdit.EchoMode.Password)
         lay_second.addWidget(self.__repeat_edt)
@@ -80,7 +87,8 @@ class ChangePassword(QDialog):
         
         lay_ok_button = QHBoxLayout()
         lay_ok_button.addStretch()
-        ok = QPushButton('OK', parent=self)
+        title = QCoreApplication.translate('Login.ChangePassword', 'OK')
+        ok = QPushButton(title, parent=self)
         lay_ok_button.addWidget(ok)
         lay.addLayout(lay_ok_button)
 

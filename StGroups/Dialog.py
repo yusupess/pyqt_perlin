@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QDialog
+from PyQt6.QtWidgets import QDialog, QApplication
 from PyQt6.QtWidgets import QLabel, QLineEdit, QTextEdit, QPushButton
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt6.QtCore import pyqtSlot
@@ -8,16 +8,21 @@ class Dialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle('Группа')
+        title = QApplication('StGroups.Dialog', 'Group')
+        self.setWindowTitle(title)
 
-        title_lbl = QLabel('Название группы', parent=self)
+        title = QApplication('StGroups.Dialog', 'Title')
+        title_lbl = QLabel(title, parent=self)
         self.__title_edt = QLineEdit(parent=self)
-
-        comment_lbl = QLabel('Примечание', parent=self)
+        
+        title = QApplication('StGroups.Dialog', 'Comment')
+        comment_lbl = QLabel(title, parent=self)
         self.__comment_edt = QTextEdit(parent=self)
-
-        ok_btn = QPushButton('OK', parent=self)
-        cancel_btn = QPushButton('Отмена', parent=self)
+        
+        title = QApplication('StGroups.Dialog', 'OK')
+        ok_btn = QPushButton(title, parent=self)
+        title = QApplication('StGroups.Dialog', 'Cancel')
+        cancel_btn = QPushButton(title, parent=self)
 
         lay = QVBoxLayout(self)
         lay.setSpacing(15)

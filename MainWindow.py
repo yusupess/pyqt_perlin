@@ -90,14 +90,18 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def about(self):
-        title = 'Управление заданиями для учащихся'
-        text = ('Программа для управления задачами\n' + 
-                'и заданиями для учащихся школы')
+        title = QApplication.translate('MainWindow.Help',
+                                       'Managing tasks for students')
+        text = QApplication.translate('MainWindow.Help', 
+                                      'Software to manage problems\n'
+                                      'and tasks for high school students')
         QMessageBox.about(self, title, text)
 
     @pyqtSlot()
     def about_qt(self):
-        QMessageBox.aboutQt(self, 'Управление заданиями для учащихся')
+        title = QApplication.translate('MainWindow.Help',
+                                       'Managing tasks for students')
+        QMessageBox.aboutQt(self, title)
 
     @pyqtSlot()
     def teacher_mode_on(self):

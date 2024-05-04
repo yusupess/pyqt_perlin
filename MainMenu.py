@@ -30,42 +30,60 @@ class MainMenu(QMenuBar):
 
     def __init__(self, parent):
         super().__init__(parent)
-
-        teacher_menu = self.addMenu('Учитель')
+        
+        title = QApplication.translate('MainMenu', 'Teacher')
+        teacher_menu = self.addMenu(title)
         self.__teacher_menu_action = teacher_menu.menuAction()
-        self.__teacher_add = teacher_menu.addAction('Добавить')
-        self.__teacher_edit = teacher_menu.addAction('Редактировать')
-        self.__teacher_delete = teacher_menu.addAction('Удалить')
-
-        student_menu = self.addMenu('Студент')
+        title = QApplication.translate('MainMenu.Teacher', 'Add...')
+        self.__teacher_add = teacher_menu.addAction(title)
+        title = QApplication.translate('MainMenu.Teacher', 'Edit')
+        self.__teacher_edit = teacher_menu.addAction(title)
+        title = QApplication.translate('MainMenuTeacher', 'Delete')
+        self.__teacher_delete = teacher_menu.addAction(title)
+        
+        title = QApplication.translate('MainMenu', 'Student')
+        student_menu = self.addMenu(title)
         self.__student_menu_action = student_menu.menuAction()
-        self.__student_add = student_menu.addAction('Добавить')
+        title = QApplication.translate('MainMenu.Student', 'Add...')
+        self.__student_add = student_menu.addAction(title)
+        title = QApplication.translate('MainMenu.Student', 'Edit...')
         self.__student_edit = student_menu.addAction('Редактировать')
-        self.__student_delete = student_menu.addAction('Удалить')
-
-        stgroup_menu = self.addMenu('Группа')
+        title = QApplication.translate('MainMenu.Student', 'Delete')
+        self.__student_delete = student_menu.addAction(title)
+        
+        title = QApplication.translate('MainMenu', 'Group')
+        stgroup_menu = self.addMenu(title)
         self.__stgroup_menu_action = stgroup_menu.menuAction()
-        self.__stgroup_add = stgroup_menu.addAction('Добавить')
-        self.__stgroup_edit = stgroup_menu.addAction('Редактировать')
-        self.__stgroup_delete = stgroup_menu.addAction('Удалить')
-        self.__stgroup_add_old_student = stgroup_menu.addAction('Добавить студента...')
-        mode_menu = self.addMenu('Режимы')
+        title = QApplication.translate('MainMenu.Group', 'Add...')
+        self.__stgroup_add = stgroup_menu.addAction(title)
+        title = QApplication.translate('MainMenu.Group', 'Edit...')
+        self.__stgroup_edit = stgroup_menu.addAction(title)
+        title = QApplication.translate('MainMenu.Group', 'Delete')
+        self.__stgroup_delete = stgroup_menu.addAction(title)
+        title = QApplication.translate('MainMenu.Group', 'Add student...')
+        self.__stgroup_add_old_student = stgroup_menu.addAction(title)
+        
+        title = QApplication.translate('MainMenu', 'Mode')
+        mode_menu = self.addMenu(title)
         mode_action_group = ag = QActionGroup(self)
         self.__mode_menu_action = mode_menu.menuAction()
-        self.__teacher_mode_action = act = mode_menu.addAction('Учителя')
+        title = QApplication.translate('MainMenu.Mode', 'Teachers')
+        self.__teacher_mode_action = act = mode_menu.addAction(title)
         act.setCheckable(True)
         # для того чтобы сделать режим переключение, 
         # т.е при выборе другого подменю галочка на этом пропадет
         ag.addAction(act)
         act.toggled.connect(self.toggle_teacher_mode)
         # для того чтобы кнопка учитель не отображадась при старте приложения
-
-        self.__student_mode_action = act = mode_menu.addAction('Студенты')
+        
+        title = QApplication.translate('MainMenu.Mode', 'Students')
+        self.__student_mode_action = act = mode_menu.addAction(title)
         act.setCheckable(True)
         ag.addAction(act)
         # для того чтобы кнопка ученик не отображадась при старте приложения
         act.toggled.connect(self.toggle_student_mode)
-        self.__stgroup_mode_action = act = mode_menu.addAction('Группы')
+        title = QApplication.translate('MainMenu.Mode', 'Groups')
+        self.__stgroup_mode_action = act = mode_menu.addAction(title)
         act.setCheckable(True)
         ag.addAction(act)
         # для того чтобы кнопка группы не отображадась при старте приложения
@@ -74,9 +92,12 @@ class MainMenu(QMenuBar):
         self.__view_menu = vm = ViewMenu(parent=self)
         self.addMenu(vm)
         
-        help_menu = self.addMenu('Справка')
-        self.__about = help_menu.addAction('О программе...')
-        self.__about_qt = help_menu.addAction('О библиотеке Qt...')
+        title = QApplication.translate('MainMenu', 'Help')
+        help_menu = self.addMenu(title)
+        title = QApplication.translate('MainMenu.Help', 'About...')
+        self.__about = help_menu.addAction(title)
+        title = QApplication.translate('MainMenu.Help', 'About Qt...')
+        self.__about_qt = help_menu.addAction(title)
 
         self.toggle_teacher_mode(False)
         self.toggle_student_mode(False)

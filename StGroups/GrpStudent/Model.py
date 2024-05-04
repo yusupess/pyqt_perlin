@@ -13,7 +13,11 @@ SELECT_ALL = """select st.pk,
                 where id_group = %s;
              """
 
-
+ADD_STUDENT = """
+                 insert into student_group(id_student,
+                                           id_group)
+                 values (%s, %s);
+"""
 
 class Model(QAbstractTableModel):
 
@@ -73,9 +77,16 @@ class Model(QAbstractTableModel):
     def add_students(self, new_students):
         self.beginResetModel()
         try:
-            for id_student, fname in new_students:
-                data = db.Student(pk=id_student, fio=fname)
-                self.__students.insert(0, data)
+            conn = psycopg2.connect(**st.db_params)
+            try:
+                with conn:
+                    with conn.cursor() as cursor:
+                        for id_student, fname in new_students:
+                            data = db.Student(pk=id_student, fio=fname)
+                            self.__students.insert(0, data)
+                            cursor.execute(ADD_STUDENT, (id_student, self.__id_group))
+            finally:
+                conn.close()
         finally:
             self.endResetModel()
         
